@@ -1,0 +1,14 @@
+{
+  "globalDependencies": {
+    "core-js": "registry:dt/core-js#0.0.0+20160317120654",
+    "jasmine": "registry:dt/jasmine#2.2.0+20160412134438",
+    "jquery": "registry:dt/jquery#1.10.0+20160620094458",
+    "moment": "registry:dt/moment#2.8.0+20160316155526",
+    "moment-node": "registry:dt/moment-node#2.11.1+20160511043338",
+    "node": "registry:dt/node#4.0.0+20160509154515",
+    "underscore": "registry:dt/underscore#1.7.0+20160412141459"
+  },
+  "dependencies": {
+    "lodash": "registry:npm/lodash#4.0.0+20160416211519"
+  }
+}
