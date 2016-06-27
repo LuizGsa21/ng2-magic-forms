@@ -1,6 +1,7 @@
 import {Component, ElementRef} from "@angular/core";
 import {Field, IField} from "./base";
 import {FormService} from "../services/form.service";
+import {DivLayout} from "../layouts/empty.layout";
 
 export interface DivDefaultOptions {
     html: string,
@@ -14,26 +15,28 @@ export interface DivDefault extends IField {
 
 @Component({
     selector: 'divDefaultTemplate',
-    template: `<div [class]="templateOptions.className || ''"></div>`
+    directives: [DivLayout],
+    template: `<div divLayout [field]="self"><div [class]="templateOptions.className || ''"></div></div>`
 })
 export class DivDefaultTemplate extends Field<DivDefault, DivDefaultOptions> {
-
-    get usesTransclusion() {
-        return false;
-    }
 
     constructor(private _elementRef: ElementRef, protected formService: FormService) {
         super(formService);
     }
 
     ngOnInit() {
-        this.initOptions();
+        super.ngOnInit();
         this.innerHTML(this.templateOptions.html || '');
+        // console.log('initialize', (this.control as any).hidden);
+        // console.log('initialize', (this.control as any).hidden);
     }
     getDiv() {
-        return this._elementRef.nativeElement.querySelector('div');
+        return this._elementRef.nativeElement.querySelector('div > div');
     }
     innerHTML(content: string) {
-        this.getDiv().innerHTML = content;
+        let div = this.getDiv();
+        if (div) {
+            div.innerHTML = content;
+        }
     }
 }

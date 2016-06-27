@@ -45,10 +45,6 @@ export class MagicForm implements OnInit {
     ngOnInit() {
         this.formService.init();
         this.form = this.formService.getForm();
-        console.log(this.form);
-        this.form.valueChanges.subscribe((...args) => {
-            // console.log('form changed', args);
-        });
     }
 
 
@@ -57,9 +53,6 @@ export class MagicForm implements OnInit {
         if (this._formOptions !== fields) {
             this._formOptions = fields;
         }
-        // if (isPresent(fields)) {
-        //     this.validate(fields);
-        // }
     }
 
     get formOptions() {

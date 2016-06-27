@@ -3,6 +3,7 @@ import {Control, Validators, AbstractControl} from "@angular/common";
 import {throwError, isBlank} from "../util";
 import {MagicControlGroup} from "../models/magic_group";
 import {IField} from "../templates/base";
+import {MagicControl} from "../models/magic_control";
 
 
 @Injectable()
@@ -31,7 +32,10 @@ export class FormService {
             validators = option.validators.map((v) => this._extendValidator(v, option));
         }
         validators = this._extractValidators(validators);
-        let control = new Control(option.defaultValue, validators);
+        let control = new MagicControl(option, validators);
+        if (option.valueChanges) {
+            control.valueChanges.subscribe((value) => option.valueChanges(value, option, control, this));
+        }
         this._form.addControl(option.key, control);
         return control;
     }

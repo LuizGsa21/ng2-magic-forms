@@ -13,8 +13,12 @@ export interface IField {
     validators?: any[];
     defaultValue?: any;
     fieldGroup?: any[];
+    
     // custom fields used by templates/layouts
     templateOptions?: any;
+    
+    // events
+    valueChanges: any;
 }
 
 export class Field<T extends IField, U> implements OnInit, OnDestroy {

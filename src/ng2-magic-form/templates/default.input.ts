@@ -36,8 +36,8 @@ export class InputDefaultTemplate extends Field<InputDefault, InputDefaultOption
 
     constructor(protected formService: FormService) {
         super(formService);
-        var annotations = Reflect.getOwnMetadata('annotations', InputDefaultTemplate);
-        console.log('annotations', annotations);
+        // var annotations = Reflect.getOwnMetadata('annotations', InputDefaultTemplate);
+        // console.log('annotations', annotations);
     }
 
 }

@@ -64,7 +64,6 @@ export class MagicField implements OnInit {
     }
 
     createTemplates (options: IField[]) {
-        console.log(options);
         options.forEach((option) => this.createTemplate(option));
     }
 
@@ -82,7 +81,7 @@ export class MagicField implements OnInit {
     }
 
     _createTemplate (component: Function, option: IField) {
-        console.debug('createTemplate() type:', option.type, 'options:', option);
+        // console.debug('createTemplate() type:', option.type, 'options:', option);
         this.componentResolver.resolveComponent(component).then((componentFactory: ComponentFactory<any>) => {
             let view = this.childRef.viewContainer.createComponent(componentFactory);
             view.instance.option = option;
