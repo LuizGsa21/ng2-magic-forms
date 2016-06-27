@@ -1,8 +1,14 @@
 # Created by .ignore support plugin (hsz.mobi)
 node_modules
-typings
 dist
 build
 tmp
 coverage
-lib
+src
+.idea
+config
+karma.conf.js
+wallaby.js
+webpack.config.js
+typings/
+typings.json

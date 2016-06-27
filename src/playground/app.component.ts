@@ -1,5 +1,6 @@
 import {Component} from "@angular/core";
 import {MagicForm} from "../ng2-magic-form/magic_form.component";
+import {MagicValidators} from "../ng2-magic-form/validators/index";
 // import {DynamicFormComponent} from "./dynamicForm";
 // import {FormValidators, transformMessage} from "./dynamicForm/formValidators";
 // import {Validators} from "@angular/common";
@@ -103,6 +104,9 @@ export class AppComponent {
                 type: 'inputGroup',
                 defaultValue: null,
                 validators: [
+                    MagicValidators.requiredTransform(function (error) {
+                        return 'wtf'
+                    })
                     // transformMessage(FormValidators.required, 'A name for the new Amenity is required')
                 ],
                 templateOptions: {
@@ -170,7 +174,7 @@ export class AppComponent {
                     }
                 ]
             }
-        ]
+        ];
 
     }
     
