@@ -2,6 +2,7 @@ import {InputDefaultTemplate} from "./default.input";
 import {RadioDefaultTemplate} from "./default.radio";
 import {TextareaDefaultTemplate} from "./default.textarea";
 import {SelectDefaultTemplate} from "./default.select";
+import {InputGroupInlineTemplate} from "./inline.input_group";
 // import {TextareaDefaultTemplate} from "./default.textarea";
 // import {SelectDefaultTemplate} from "./default.select";
 // import {RadioDefaultTemplate} from "./default.radio";
@@ -13,5 +14,5 @@ export const FieldTemplates = {
     'select': SelectDefaultTemplate,
     'radio': RadioDefaultTemplate,
     // 'div': DivDefaultTemplate,
-    // 'inputGroup': InputGroupInlineTemplate
+    'inputGroup': InputGroupInlineTemplate
 };

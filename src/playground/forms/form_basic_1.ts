@@ -60,5 +60,68 @@ export let FormBasic1 = [
                 {value: '4715', text: 'New Scheme (corp) '}
             ]
         }
+    },
+    // {
+    //     key: 'divDescription',
+    //     type: 'div',
+    //     hidden: true,
+    //     hostClassName: 'row',
+    //     templateOptions: {
+    //         className: 'col-xs-12',
+    //         html: `<strong>Note - Pricing for Amentities is a future enhancement to ClubReady, you can configure them now, the pricing is not currently implemented in the agreement process, it will be completed at a later date. Amenities are not sold on their own - they are always tied to sales package agreements. Any price is added on to the sales package price and the frequency of payment is the sales package frequency (most typically a $ charge every month - but dependant upon the sales package that grants the amenity)</strong>`,
+    //     }
+    // },
+    {
+        hostClassName: 'row',
+        key: 'price',
+        type: 'inputGroup',
+        defaultValue: null,
+        validators: [
+            MagicValidators.requiredTransform('Price field is required.')
+            // transformMessage(FormValidators.required, 'A name for the new Amenity is required')
+        ],
+        templateOptions: {
+            leftSideClass: 'col-xs-6',
+            rightSideClass: 'col-xs-6',
+            label: 'Price',
+            type: 'number',
+            leftAddon: '$',
+            description: 'eg Tanning, Free Towels, Sauna, VIP pass'
+        }
+    },
+    {
+        hostClassName: 'row',
+        key: 'minPrice',
+        type: 'inputGroup',
+        defaultValue: null,
+        validators: [
+            // transformMessage(FormValidators.required, 'A name for the new Amenity is required')
+        ],
+        templateOptions: {
+            leftSideClass: 'col-xs-6',
+            rightSideClass: 'col-xs-6',
+            label: 'Min Price',
+            type: 'number',
+            leftAddon: '$',
+            // description: 'eg Tanning, Free Towels, Sauna, VIP pass'
+        }
+    },
+    {
+        hostClassName: 'row',
+        key: 'maxPrice',
+        type: 'inputGroup',
+        defaultValue: null,
+        validators: [
+            // transformMessage(FormValidators.required, 'A name for the new Amenity is required')
+        ],
+        templateOptions: {
+            leftSideClass: 'col-xs-6',
+            rightSideClass: 'col-xs-6',
+            label: 'Max Price',
+            type: 'number',
+            leftAddon: '$',
+            rightAddon: '.00',
+            description: 'eg Tanning, Free Towels, Sauna, VIP pass'
+        }
     }
 ]; 
