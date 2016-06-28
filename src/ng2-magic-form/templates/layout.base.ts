@@ -16,11 +16,5 @@ export class BaseLayout {
     get field() {
         return this._field;
     }
-
-    // @HostBinding('class')
-    // get className() {
-    //     if (!this._field) return '';
-    //     return this._field.templateOptions.className || '';
-    // }
 }
 

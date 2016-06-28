@@ -25,7 +25,7 @@ export interface InputDefault extends IField {
         DefaultLayout
     ],
     template: `
-    <div defaultLayout [field]="field">
+    <div defaultLayout [field]="field" [class]="field.option.templateOptions.className || ''">
      <label *ngIf="field.templateOptions.label" [attr.for]="field.option.key" class="control-label">{{ field.templateOptions.label }}</label>
      <input [ngFormControl]="field.control" [type]="field.templateOptions.type" [id]="field.option.key" [placeholder]="field.templateOptions.placeholder || ''" class="form-control">
     </div>

@@ -13,7 +13,7 @@ import {
 } from "@angular/core";
 import {throwError} from "rxjs/util/throwError";
 import {FieldTemplates} from "./templates/templates";
-import {isArray, isFunction} from "./util";
+import {isArray, isFunction, isEmpty} from "./util";
 import {FormService} from "./services/form.service";
 import {Control} from "@angular/common";
 
@@ -25,7 +25,7 @@ import {Control} from "@angular/common";
  */
 @Directive({
     selector: '[childRef]',
-    // styles: [`:host { display: none; }`]
+    styles: [`:host { display: none; }`]
 })
 export class ChildRef {
     constructor (public viewContainer: ViewContainerRef) {}
@@ -186,31 +186,27 @@ export class MagicField extends Field<any, any> implements OnInit {
         options.forEach((option) => this.createTemplate(option));
     }
 
-    createTemplate (option: IField) {
-        let fieldConstructor;
+    createTemplate (option: IField): any {
         if (option.type == 'container') {
-            fieldConstructor = MagicField;
-            if (option.children && option.children.length) {
-
-                return;
-            } else {
-                throwError('Container type requires children elements');
-            }
-
+            return this._createRecursive(option.children);
         } else {
-            fieldConstructor = FieldTemplates[option.type];
+            let fieldConstructor = FieldTemplates[option.type];
+            if (!fieldConstructor) {
+                throwError(`Template type '${option.type}' does not exit.`);
+            }
+            return this._createTemplate(fieldConstructor, option);
         }
 
-        if (!fieldConstructor) {
-            throwError(`Template type '${option.type}' does not exit.`);
-        }
-        return this._createTemplate(fieldConstructor, option);
         // let usesTransclusion = fieldConstructor.prototype.usesTransclusion;
         // if (usesTransclusion) {
         //     this._createTemplate(fieldConstructor, option);
         // } else {
         //     setTimeout(() => this._createTemplate(fieldConstructor, option))
         // }
+    }
+
+    createRecursiveTempate(options: any) {
+
     }
 
     _createTemplate (component: Function, option: IField) {
@@ -223,6 +219,19 @@ export class MagicField extends Field<any, any> implements OnInit {
             } else {
                 view.instance.field = this.self;
             }
+        });
+    }
+
+    private _createRecursive (children: IField[]) {
+        if (isEmpty(children)) {
+            throwError('Container type requires children elements');
+        }
+        return children.map((option) => {
+            return this.componentResolver.resolveComponent(MagicField as Type).then((componentFactory: ComponentFactory<any>) => {
+                console.log('this.childRef', this.childRef);
+                let view = this.childRef.viewContainer.createComponent(componentFactory);
+                view.instance.option = option;
+            });
         });
     }
 }

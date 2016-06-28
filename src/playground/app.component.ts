@@ -20,6 +20,7 @@ export class AppComponent {
 
     // fields: IField[];
     fields: any[];
+
     constructor () {
         // this.fields = [{
         //     hostClassName: 'col-xs-12',
@@ -214,86 +215,97 @@ export class AppComponent {
         //         }
         //     ]
         // }]
+
+
+        /**
+         * Recursive Test
+         */
         this.fields = [
             {
-                hostClassName: 'row',
-                className: 'col-xs-12',
-                key: 'amenityName',
-                type: 'input',
-                defaultValue: null,
-                validators: [
-                    MagicValidators.requiredTransform('A name for the new Amenity is required')
-                ],
-                templateOptions: {
-                    className: 'col-xs-12',
-                    label: 'Name of The New Amenity',
-                    type: 'text',
-                    description: 'eg Tanning, Free Towels, Sauna, VIP pass'
-                }
-            },
-            {
-                hostClassName: 'row my-seconf-child-host',
-                className: 'col-xs-12',
-                key: 'amenityName2',
-                type: 'input',
-                defaultValue: null,
-                validators: [
-                    MagicValidators.requiredTransform('A name for the new Amenity is required')
-                ],
-                templateOptions: {
-                    className: 'col-xs-12',
-                    label: 'Name of The New Amenity',
-                    type: 'text',
-                    description: 'eg Tanning, Free Towels, Sauna, VIP pass'
-                }
-            },
-            // {
-            //     hostClassName: 'row',
-            //     key: 'amenityDescription',
-            //     type: 'textarea',
-            //     defaultValue: null,
-            //     validators: [],
-            //     templateOptions: {
-            //         className: 'col-xs-12',
-            //         label: 'Amenity Description',
-            //         placeholder: 'Optional',
-            //         type: 'text'
-            //     }
-            // },
-            // {
-            //     hostClassName: 'row',
-            //     key: 'myRadioButton',
-            //     type: 'radio',
-            //     defaultValue: '0',
-            //     templateOptions: {
-            //         className: 'col-xs-12',
-            //         radios: [
-            //             {value: '0', text: 'This amenity has no directly associated price'},
-            //             {value: '1', text: 'This amenity has an associated price'},
-            //         ]
-            //     }
-            // },
-            // {
-            //     hostClassName: 'row',
-            //     key: 'discountId',
-            //     type: 'select',
-            //     defaultValue: '0',
-            //     templateOptions: {
-            //         className: 'col-xs-12',
-            //         options: [
-            //             {value: '0', text: 'Optional - Assign An Associated Discount Scheme This Amenity Will Include'},
-            //             {value: '431', text: 'Member Referral'},
-            //             {value: '471', text: '50% off all products'},
-            //             {value: '4713', text: 'asdfasdf'},
-            //             {value: '4715', text: 'New Scheme (corp) '}
-            //         ]
-            //     }
-            // }
-        ]
+                key: 'container',
+                type: 'container',
+                hostClassName: 'my-container hostClassName',
+                // containers don't have className property
+                // className: 'row my-container2 className',
+                children: [
+                    {
+                        hostClassName: 'row amenityName hostClassName',
+                        className: 'col-xs-12 amenityName className',
+                        key: 'amenityName',
+                        type: 'input',
+                        defaultValue: null,
+                        validators: [
+                            MagicValidators.requiredTransform('A name for the new Amenity is required')
+                        ],
+                        templateOptions: {
+                            className: 'amenityName templateOptions.className',
+                            label: 'Name of The New Amenity',
+                            type: 'text',
+                            description: 'eg Tanning, Free Towels, Sauna, VIP pass'
+                        }
+                    },
+                    {
+                        hostClassName: 'row amenityName2 hostClassName',
+                        className: 'col-xs-12 amenityName2 className',
+                        key: 'amenityName2',
+                        type: 'input',
+                        defaultValue: null,
+                        validators: [
+                            MagicValidators.requiredTransform('A name for the new Amenity is required')
+                        ],
+                        templateOptions: {
+                            className: 'amenityName2 templateOptions.className',
+                            label: 'Name of The New Amenity',
+                            type: 'text',
+                            description: 'eg Tanning, Free Towels, Sauna, VIP pass'
+                        }
+                    },
+                    {
+                        key: 'container2',
+                        type: 'container',
+                        hostClassName: 'row my-container2 hostClassName',
+                        // containers don't have className property
+                        // className: 'row my-container2 className',
+                        children: [{
+                            hostClassName: 'col-xs-12 amenityName3 hostClassName',
+                            className: 'row amenityName3 className',
+                            key: 'amenityName3',
+                            type: 'input',
+                            defaultValue: null,
+                            validators: [
+                                MagicValidators.requiredTransform('A name for the new Amenity is required')
+                            ],
+                            templateOptions: {
+                                className: 'col-xs-12 amenityName3 templateOptions.className',
+                                label: 'Name of The New Amenity',
+                                type: 'text',
+                                description: 'eg Tanning, Free Towels, Sauna, VIP pass'
+                            }
+                        },
+                            {
+                                hostClassName: 'col-xs-12 amenityName4 hostClassName',
+                                className: 'row amenityName4 className',
+                                key: 'amenityName4',
+                                type: 'input',
+                                defaultValue: null,
+                                validators: [
+                                    MagicValidators.requiredTransform('A name for the new Amenity is required')
+                                ],
+                                templateOptions: {
+                                    className: 'col-xs-12 amenityName4 templateOptions.className',
+                                    label: 'Name of The New Amenity',
+                                    type: 'text',
+                                    description: 'eg Tanning, Free Towels, Sauna, VIP pass'
+                                }
+                            }]
+                    }
+                ]
+            }
+        ];
 
     }
-    
-    submit(event) {
+
+    submit (event) {
         console.log(event);
     }
 }
