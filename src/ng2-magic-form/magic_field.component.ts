@@ -25,7 +25,7 @@ import {Control} from "@angular/common";
  */
 @Directive({
     selector: '[childRef]',
-    styles: [`:host { display: none; }`]
+    // styles: [`:host { display: none; }`]
 })
 export class ChildRef {
     constructor (public viewContainer: ViewContainerRef) {}

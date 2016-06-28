@@ -13,10 +13,6 @@ export interface InputDefaultOptions extends IField {
     description?: string
 }
 
-export interface InputDefault extends IField {
-    templateOptions: InputDefaultOptions
-}
-
 
 @Component({
     selector: 'inputDefaultTemplate',

@@ -71,9 +71,10 @@ export class MagicForm implements OnInit {
     }
     
     get debugErrors() {
-        // if (!this.form) return null;
-        return Object.keys(this.form.controls)
+        if (!this.form) return null;
+        let errors = Object.keys(this.form.controls)
             .map(this.formService.getControlErrors.bind(this.formService))
-            .filter((value) => !!value && (value as any).length !== 0)
+            .filter((value) => !!value && (value as any).length !== 0);
+        return this._debug(errors);
     }
 }
