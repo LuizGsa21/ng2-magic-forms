@@ -19,6 +19,9 @@ export interface IField {
     
     // events
     valueChanges: any;
+    onClick: any;
+    onBlur: any;
+    onFocus: any;
 }
 
 export class Field<T extends IField, U> implements OnInit, OnDestroy {
@@ -71,7 +74,28 @@ export class Field<T extends IField, U> implements OnInit, OnDestroy {
     }
 
     registerListeners() {
-        this.control.valueChanges.subscribe(() => this.syncErrors());
+        this.control.valueChanges.subscribe((value) => {
+            this.syncErrors();
+            this._callEvent('valueChanges', value);
+        });
+    }
+
+    _callEvent(eventName: string, value: any) {
+        if (this.option[eventName]) {
+            this.option[eventName](value, this.option, this.control, this.formService);
+        }
+    }
+
+    onClick(event: any) {
+        this._callEvent('onClick', event);
+    }
+
+    onBlur(event: any) {
+        this._callEvent('onBlur', event);
+    }
+
+    onFocus(event: any) {
+        this._callEvent('onFocus', event);
     }
 
     updateControl(value) {

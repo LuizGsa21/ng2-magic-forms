@@ -33,9 +33,6 @@ export class FormService {
         }
         validators = this._extractValidators(validators);
         let control = new MagicControl(option, validators);
-        if (option.valueChanges) {
-            control.valueChanges.subscribe((value) => option.valueChanges(value, option, control, this));
-        }
         this._form.addControl(option.key, control);
         return control;
     }

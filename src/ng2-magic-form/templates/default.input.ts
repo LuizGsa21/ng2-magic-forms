@@ -3,6 +3,7 @@ import {Input, OnInit, Component, HostBinding} from "@angular/core";
 import {IField, Field} from "./base";
 import {FormService} from "../services/form.service";
 import {DefaultLayout} from "../layouts/default.layout";
+import {InlineLayout} from "../layouts/inline.layout";
 
 
 export interface InputDefaultOptions extends IField {
