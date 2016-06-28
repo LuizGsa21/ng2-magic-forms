@@ -1,6 +1,7 @@
 import {Input, OnInit, Component, HostBinding, ElementRef, OnDestroy} from "@angular/core";
 import {Control} from "@angular/common";
 import {FormService} from "../services/form.service";
+import {isFunction} from "../util";
 
 /**
  * All templates/layouts must support these fields.
@@ -12,7 +13,7 @@ export interface IField {
     hidden?: any;
     validators?: any[];
     defaultValue?: any;
-    children?: any[];
+    children?: IField[];
     
     // custom fields used by templates/layouts
     templateOptions?: any;
@@ -82,7 +83,7 @@ export class Field<T extends IField, U> implements OnInit, OnDestroy {
 
     _callEvent(eventName: string, value: any) {
         if (this.option[eventName]) {
-            this.option[eventName](value, this.option, this.control, this.formService);
+            return this.option[eventName](value, this.option, this.control, this.formService);
         }
     }
 
@@ -97,6 +98,16 @@ export class Field<T extends IField, U> implements OnInit, OnDestroy {
     onFocus(event: any) {
         this._callEvent('onFocus', event);
     }
+
+    get hidden() {
+        let hidden = this.option.hidden;
+        if (isFunction(hidden)) {
+            return !!this._callEvent('hidden', this.control.value);
+        } else {
+            return !!hidden;
+        }
+    }
+
 
     updateControl(value) {
         this.control.updateValue(value, {onlySelf: false, emitEvent: true, emitModelToViewChange: true});

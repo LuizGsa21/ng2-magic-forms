@@ -9,13 +9,4 @@ export class MagicControl extends Control {
         super(options.defaultValue, validator, asyncValidator);
     }
 
-    get hidden() {
-        let hidden = this.options.hidden;
-        // console.log('hidden?', this.options.hidden);
-        if (isFunction(hidden)) {
-            return !!hidden(this, this.options);
-        } else {
-            return !!hidden;
-        }
-    }
 }

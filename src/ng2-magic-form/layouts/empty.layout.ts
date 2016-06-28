@@ -3,6 +3,6 @@ import {BaseLayout} from "./base.layout";
 
 @Component({
     selector: '[divLayout]',
-    template: `<div *ngIf="!control.hidden"><ng-content></ng-content></div>`
+    template: `<div *ngIf="!field.hidden"><ng-content></ng-content></div>`
 })
 export class DivLayout extends BaseLayout {}
