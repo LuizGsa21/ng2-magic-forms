@@ -32,9 +32,9 @@ class ChildRef {
 @Component({
     selector: 'magicField',
     directives: [
-        ChildRef
+        ChildRef,
+        MagicField
     ],
-
     template: `<div childRef></div>`
 })
 export class MagicField implements OnInit {
@@ -52,8 +52,8 @@ export class MagicField implements OnInit {
 
     ngOnInit () {
         let options;
-        if (this.option.fieldGroup) {
-            options = this.option.fieldGroup;
+        if (this.option.children) {
+            options = this.option.children;
             this.hostClassName = this.option.hostClassName || '';
         } else {
             options = [this.option];

@@ -12,7 +12,7 @@ export interface IField {
     hidden?: any;
     validators?: any[];
     defaultValue?: any;
-    fieldGroup?: any[];
+    children?: any[];
     
     // custom fields used by templates/layouts
     templateOptions?: any;

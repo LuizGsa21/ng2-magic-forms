@@ -23,7 +23,7 @@ export class AppComponent {
     constructor () {
         this.fields = [{
             hostClassName: 'col-xs-12',
-            fieldGroup: [
+            children: [
                 {
                     hostClassName: 'row',
                     key: 'amenityName',
@@ -84,7 +84,7 @@ export class AppComponent {
             ]
         }, {
             hostClassName: 'col-xs-12',
-            fieldGroup: [
+            children: [
                 {
                     key: 'divDescription',
                     type: 'div',
