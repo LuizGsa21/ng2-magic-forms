@@ -1,9 +1,7 @@
-import {Control} from "@angular/common";
-import {Input, OnInit, Component, HostBinding} from "@angular/core";
-import {IField, Field} from "./base";
-import {FormService} from "../services/form.service";
-import {DefaultLayout} from "../layouts/default.layout";
-import {InlineLayout} from "../layouts/inline.layout";
+import {Component} from "@angular/core";
+import {IField} from "../magic_field.component";
+import {BaseTemplate} from "./base";
+import {DefaultLayout} from "./layout.default";
 
 
 export interface InputDefaultOptions extends IField {
@@ -27,18 +25,12 @@ export interface InputDefault extends IField {
         DefaultLayout
     ],
     template: `
-    <div defaultLayout [field]="self">
-     <label *ngIf="templateOptions.label" [attr.for]="option.key" class="control-label">{{ templateOptions.label }}</label>
-     <input [ngFormControl]="control" [type]="templateOptions.type" [id]="option.key" [placeholder]="templateOptions.placeholder || ''" class="form-control">
+    <div defaultLayout [field]="field">
+     <label *ngIf="field.templateOptions.label" [attr.for]="field.option.key" class="control-label">{{ field.templateOptions.label }}</label>
+     <input [ngFormControl]="field.control" [type]="field.templateOptions.type" [id]="field.option.key" [placeholder]="field.templateOptions.placeholder || ''" class="form-control">
     </div>
 `
 })
-export class InputDefaultTemplate extends Field<InputDefault, InputDefaultOptions> {
-
-    constructor(protected formService: FormService) {
-        super(formService);
-        // var annotations = Reflect.getOwnMetadata('annotations', InputDefaultTemplate);
-        // console.log('annotations', annotations);
-    }
+export class InputDefaultTemplate extends BaseTemplate {
 
 }

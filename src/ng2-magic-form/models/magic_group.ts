@@ -1,7 +1,7 @@
 import {ControlGroup, AbstractControl, Validators} from "@angular/common";
 import {throwError, isEmpty} from "../util";
 import {MagicControl} from "./magic_control";
-import {IField} from "../templates/base";
+import {IField} from "../magic_field.component";
 
 
 export class MagicControlGroup extends ControlGroup {

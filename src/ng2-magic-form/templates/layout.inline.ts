@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {BaseLayout} from "./base.layout";
+import {BaseLayout} from "./layout.base";
 
 @Component({
     selector: '[inlineLayout]',

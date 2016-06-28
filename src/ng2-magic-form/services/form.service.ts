@@ -1,9 +1,9 @@
 import {Injectable} from "@angular/core";
-import {Control, Validators, AbstractControl} from "@angular/common";
+import {Validators, AbstractControl} from "@angular/common";
 import {throwError, isBlank} from "../util";
 import {MagicControlGroup} from "../models/magic_group";
-import {IField} from "../templates/base";
 import {MagicControl} from "../models/magic_control";
+import {IField} from "../magic_field.component";
 
 
 @Injectable()

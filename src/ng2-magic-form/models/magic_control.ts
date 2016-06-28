@@ -1,7 +1,6 @@
 import {Control} from "@angular/common";
 import {ValidatorFn, AsyncValidatorFn} from "@angular/common/src/forms/directives/validators";
-import {IField} from "../templates/base";
-import {isFunction} from "../util";
+import {IField} from "../magic_field.component";
 
 export class MagicControl extends Control {
 

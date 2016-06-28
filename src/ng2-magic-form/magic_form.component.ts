@@ -2,8 +2,7 @@ import {Component, Input, OnInit, Output, EventEmitter} from "@angular/core";
 import {FORM_DIRECTIVES} from "@angular/common";
 import {FormService} from "./services/form.service";
 import {MagicControlGroup} from "./models/magic_group";
-import {IField} from "./templates/base";
-import {MagicField} from "./magic_field.component";
+import {MagicField, IField} from "./magic_field.component";
 
 
 @Component({

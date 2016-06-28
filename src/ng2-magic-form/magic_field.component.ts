@@ -8,11 +8,14 @@ import {
     ViewContainerRef,
     ViewChild,
     Type,
-    HostBinding
+    HostBinding,
+    OnDestroy
 } from "@angular/core";
 import {throwError} from "rxjs/util/throwError";
 import {FieldTemplates} from "./templates/templates";
-import {IField} from "./templates/base";
+import {isArray, isFunction} from "./util";
+import {FormService} from "./services/form.service";
+import {Control} from "@angular/common";
 
 
 /**
@@ -21,10 +24,135 @@ import {IField} from "./templates/base";
  * @internal
  */
 @Directive({
-    selector: '[childRef]'
+    selector: '[childRef]',
+    // styles: [`:host { display: none; }`]
 })
-class ChildRef {
-    constructor (public viewContainer: ViewContainerRef) {
+export class ChildRef {
+    constructor (public viewContainer: ViewContainerRef) {}
+}
+
+
+/**
+ * All templates/layouts must support these fields.
+ */
+export interface IField {
+    // magic field class
+    hostClassName?: string;
+    // template root class
+    className?: string;
+    key: string;
+    type: string;
+    hidden?: any;
+    validators?: any[];
+    defaultValue?: any;
+    children?: IField[];
+
+    // custom fields used by templates/layouts
+    templateOptions?: any;
+
+    // events
+    valueChanges: any;
+    onClick: any;
+    onBlur: any;
+    onFocus: any;
+}
+
+export class Field<T extends IField, U> implements OnInit, OnDestroy {
+
+    @HostBinding('class')
+    hostClassName: string;
+
+    @Input('option')
+    option: T;
+
+    templateOptions: U;
+
+    control: Control;
+    errors: any[];
+
+    @ViewChild(ChildRef as Type)
+    childRef: ChildRef;
+
+    self: this;
+
+    constructor(protected formService: FormService) {
+        this.self = this;
+    }
+
+    /**
+     * If your template uses transclusion this should always return true. Otherwise override this getter and return false.
+     * NOTE: when overriding, YOU HAVE TO USE A GETTER. We use the Classes prototype when validating.
+     *
+     * When a field does not use transclusion, its creation process is wrapped in a setTimeout call.
+     * This is required for the fields to maintain their order when rendered.
+     * @returns {boolean}
+     */
+    get usesTransclusion() {
+        return true;
+    }
+
+    ngOnInit() {
+        console.log('init field field');
+        this.initOptions();
+        this.initControl();
+        this.syncErrors();
+        this.registerListeners();
+    }
+
+    initOptions () {
+        this.hostClassName = this.option.hostClassName || '';
+        this.templateOptions = this.option.templateOptions;
+    }
+
+    initControl() {
+        this.control = this.formService.createControl(this.option);
+    }
+    
+    syncErrors() {
+        this.errors = this.formService.getControlErrors(this.option.key);
+    }
+
+    registerListeners() {
+        this.control.valueChanges.subscribe((value) => {
+            this.syncErrors();
+            this._callEvent('valueChanges', value);
+        });
+    }
+
+    _callEvent(eventName: string, value: any) {
+        if (this.option[eventName]) {
+            return this.option[eventName](value, this.option, this.control, this.formService);
+        }
+    }
+
+    onClick(event: any) {
+        this._callEvent('onClick', event);
+    }
+
+    onBlur(event: any) {
+        this._callEvent('onBlur', event);
+    }
+
+    onFocus(event: any) {
+        this._callEvent('onFocus', event);
+    }
+
+    get hidden() {
+        let hidden = this.option.hidden;
+        if (isFunction(hidden)) {
+            return !!this._callEvent('hidden', this.control.value);
+        } else {
+            return !!hidden;
+        }
+    }
+
+
+    updateControl(value) {
+        this.control.updateValue(value, {onlySelf: false, emitEvent: true, emitModelToViewChange: true});
+    }
+
+    ngOnDestroy() {
+        this.self = null;
     }
 }
 
@@ -32,35 +160,26 @@ class ChildRef {
 @Component({
     selector: 'magicField',
     directives: [
-        ChildRef,
-        MagicField
+        ChildRef
     ],
     template: `<div childRef></div>`
 })
-export class MagicField implements OnInit {
+export class MagicField extends Field<any, any> implements OnInit {
 
-    @Input('option')
-    option: IField;
-
-    @ViewChild(ChildRef as Type)
-    childRef: ChildRef;
-
-    @HostBinding('class')
-    hostClassName: string;
-
-    constructor (protected componentResolver: ComponentResolver) {}
+    constructor (protected formService: FormService, protected componentResolver: ComponentResolver) {
+        super(formService);
+    }
 
     ngOnInit () {
-        let options;
-        if (this.option.children) {
-            options = this.option.children;
-            this.hostClassName = this.option.hostClassName || '';
-        } else {
-            options = [this.option];
-            this.hostClassName = '';
+        super.ngOnInit();
+        if (!this.option) {
+            throwError('wtf');
         }
-        this.createTemplates(options);
-
+        let options = isArray(this.option) ? this.option : [this.option];
+        this.hostClassName = this.option.hostClassName || '';
+        // let options = (this.option as any).length ? this.option : [this.option];
+        // console.log(options);
+        this.createTemplates(options as any);
     }
 
     createTemplates (options: IField[]) {
@@ -68,23 +187,42 @@ export class MagicField implements OnInit {
     }
 
     createTemplate (option: IField) {
-        let fieldConstructor = FieldTemplates[option.type];
+        let fieldConstructor;
+        if (option.type == 'container') {
+            fieldConstructor = MagicField;
+            if (option.children && option.children.length) {
+
+                return;
+            } else {
+                throwError('Container type requires children elements');
+            }
+
+        } else {
+            fieldConstructor = FieldTemplates[option.type];
+        }
+
         if (!fieldConstructor) {
             throwError(`Template type '${option.type}' does not exit.`);
         }
-        let usesTransclusion = fieldConstructor.prototype.usesTransclusion;
-        if (usesTransclusion) {
-            this._createTemplate(fieldConstructor, option);
-        } else {
-            setTimeout(() => this._createTemplate(fieldConstructor, option))
-        }
+        return this._createTemplate(fieldConstructor, option);
+        // let usesTransclusion = fieldConstructor.prototype.usesTransclusion;
+        // if (usesTransclusion) {
+        //     this._createTemplate(fieldConstructor, option);
+        // } else {
+        //     setTimeout(() => this._createTemplate(fieldConstructor, option))
+        // }
     }
 
     _createTemplate (component: Function, option: IField) {
-        // console.debug('createTemplate() type:', option.type, 'options:', option);
-        this.componentResolver.resolveComponent(component).then((componentFactory: ComponentFactory<any>) => {
+        console.debug('createTemplate() type:', option.type, 'options:', option, 'component', component);
+        return this.componentResolver.resolveComponent(component).then((componentFactory: ComponentFactory<any>) => {
+            console.log('this.childRef', this.childRef);
             let view = this.childRef.viewContainer.createComponent(componentFactory);
-            view.instance.option = option;
+            if (component === MagicField) {
+                view.instance.option = option.children;
+            } else {
+                view.instance.field = this.self;
+            }
         });
     }
 }
