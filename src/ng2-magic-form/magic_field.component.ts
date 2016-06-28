@@ -59,11 +59,34 @@ export interface IField {
 
 export class Field<T extends IField, U> implements OnInit, OnDestroy {
 
+    private _hostClassName = '';
+
     @HostBinding('class')
-    hostClassName: string;
+    set hostClassName(value) {
+        this._hostClassName = value;
+    }
+
+    get hostClassName() {
+        let className = this._hostClassName || '';
+        return this.hidden ? className + ' hidden' : className;
+    }
 
     @Input('option')
     option: T;
+
+    // @HostBinding('style.display')
+    // get hideHost() {
+    //     if (this.hidden) {
+    //         return 'none';
+    //     } else {
+    //         return 'block';
+    //     }
+    // }
+    // @HostBinding('class')
+    // get hideHost() {
+    //     return this.hidden ? 'hidden' : '';
+    // }
+
 
     templateOptions: U;
 
@@ -92,7 +115,7 @@ export class Field<T extends IField, U> implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        console.log('init field field');
+        // console.log('init field field');
         this.initOptions();
         this.initControl();
         this.syncErrors();
@@ -140,9 +163,9 @@ export class Field<T extends IField, U> implements OnInit, OnDestroy {
     get hidden() {
         let hidden = this.option.hidden;
         if (isFunction(hidden)) {
-            return !!this._callEvent('hidden', this.control.value);
+            return this._callEvent('hidden', this.control.value);
         } else {
-            return !!hidden;
+            return hidden;
         }
     }
 
@@ -178,7 +201,7 @@ export class MagicField extends Field<any, any> implements OnInit {
         let options = isArray(this.option) ? this.option : [this.option];
         this.hostClassName = this.option.hostClassName || '';
         // let options = (this.option as any).length ? this.option : [this.option];
-        // console.log(options);
+        // // console.log(options);
         this.createTemplates(options as any);
     }
 
@@ -210,9 +233,9 @@ export class MagicField extends Field<any, any> implements OnInit {
     }
 
     _createTemplate (component: Function, option: IField) {
-        console.debug('createTemplate() type:', option.type, 'options:', option, 'component', component);
+        // console.debug('createTemplate() type:', option.type, 'options:', option, 'component', component);
         return this.componentResolver.resolveComponent(component).then((componentFactory: ComponentFactory<any>) => {
-            console.log('this.childRef', this.childRef);
+            // console.log('this.childRef', this.childRef);
             let view = this.childRef.viewContainer.createComponent(componentFactory);
             if (component === MagicField) {
                 view.instance.option = option.children;
@@ -228,7 +251,7 @@ export class MagicField extends Field<any, any> implements OnInit {
         }
         return children.map((option) => {
             return this.componentResolver.resolveComponent(MagicField as Type).then((componentFactory: ComponentFactory<any>) => {
-                console.log('this.childRef', this.childRef);
+                // console.log('this.childRef', this.childRef);
                 let view = this.childRef.viewContainer.createComponent(componentFactory);
                 view.instance.option = option;
             });

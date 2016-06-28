@@ -10,7 +10,7 @@ export interface DivDefaultOptions {
 
 @Component({
     selector: 'divDefaultTemplate',
-    template: `<div *ngIf="!field.hidden" [class]="field.templateOptions.className || ''" [innerHTML]="field.option.templateOptions.html"></div>`
+    template: `<div *ngIf="!field.hidden" [class]="field.templateOptions?.className || ''" [innerHTML]="field.option.templateOptions.html"></div>`
 })
 export class DivDefaultTemplate extends BaseTemplate {
     
