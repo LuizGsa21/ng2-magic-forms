@@ -61,16 +61,16 @@ export let FormBasic1 = [
             ]
         }
     },
-    // {
-    //     key: 'divDescription',
-    //     type: 'div',
-    //     hidden: true,
-    //     hostClassName: 'row',
-    //     templateOptions: {
-    //         className: 'col-xs-12',
-    //         html: `<strong>Note - Pricing for Amentities is a future enhancement to ClubReady, you can configure them now, the pricing is not currently implemented in the agreement process, it will be completed at a later date. Amenities are not sold on their own - they are always tied to sales package agreements. Any price is added on to the sales package price and the frequency of payment is the sales package frequency (most typically a $ charge every month - but dependant upon the sales package that grants the amenity)</strong>`,
-    //     }
-    // },
+    {
+        key: 'divDescription',
+        type: 'div',
+        hostClassName: 'row',
+        className: 'some class',
+        templateOptions: {
+            className: 'col-xs-12',
+            html: `<strong>Note - Pricing for Amentities is a future enhancement to ClubReady, you can configure them now, the pricing is not currently implemented in the agreement process, it will be completed at a later date. Amenities are not sold on their own - they are always tied to sales package agreements. Any price is added on to the sales package price and the frequency of payment is the sales package frequency (most typically a $ charge every month - but dependant upon the sales package that grants the amenity)</strong>`,
+        }
+    },
     {
         hostClassName: 'row',
         key: 'price',
