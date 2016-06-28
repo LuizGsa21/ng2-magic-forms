@@ -1,5 +1,5 @@
 import {Control} from "@angular/common";
-import {Input} from "@angular/core";
+import {Input, HostBinding} from "@angular/core";
 import {Field} from "../magic_field.component";
 
 export class BaseLayout {
@@ -15,6 +15,11 @@ export class BaseLayout {
     }
     get field() {
         return this._field;
+    }
+
+    @HostBinding('class')
+    get className() {
+        return this._field && this._field.option.templateOptions.className || '';
     }
 }
 

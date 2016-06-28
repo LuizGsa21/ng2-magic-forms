@@ -1,7 +1,4 @@
-import {Control} from "@angular/common";
-import {Input, OnInit, Component, HostBinding} from "@angular/core";
-import {FormService} from "../services/form.service";
-import {IField} from "../magic_field.component";
+import {Component} from "@angular/core";
 import {DefaultLayout} from "./layout.default";
 import {BaseTemplate} from "./base";
 
@@ -11,10 +8,6 @@ export interface RadioFieldOptions {
     className?: string;
     description?: string;
     radios: Array<{value:string, text:string}>
-}
-
-export interface RadioDefault extends IField {
-    templateOptions?: RadioFieldOptions;
 }
 
 @Component({
