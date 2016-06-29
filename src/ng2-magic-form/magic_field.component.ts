@@ -74,20 +74,6 @@ export class Field<T extends IField, U> implements OnInit, OnDestroy {
     @Input('option')
     option: T;
 
-    // @HostBinding('style.display')
-    // get hideHost() {
-    //     if (this.hidden) {
-    //         return 'none';
-    //     } else {
-    //         return 'block';
-    //     }
-    // }
-    // @HostBinding('class')
-    // get hideHost() {
-    //     return this.hidden ? 'hidden' : '';
-    // }
-
-
     templateOptions: U;
 
     control: Control;
@@ -115,10 +101,8 @@ export class Field<T extends IField, U> implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        // console.log('init field field');
         this.initOptions();
         this.initControl();
-        this.syncErrors();
         this.registerListeners();
     }
 
@@ -196,7 +180,7 @@ export class MagicField extends Field<any, any> implements OnInit {
     ngOnInit () {
         super.ngOnInit();
         if (!this.option) {
-            throwError('wtf');
+            throwError('Ahhh! no magic field option was found.');
         }
         let options = isArray(this.option) ? this.option : [this.option];
         this.hostClassName = this.option.hostClassName || '';
