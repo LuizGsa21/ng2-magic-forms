@@ -1,6 +1,6 @@
 {
   "name": "ng2-magic-forms",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -11,7 +11,21 @@
     "start": "webpack-dev-server --config config/webpack.dev.js --inline --progress --profile --colors --watch --display-error-details --display-cached --content-base build/",
     "test": "karma start"
   },
-  "keywords": [],
+  "keywords": [
+    "angular",
+    "forms",
+    "formly",
+    "angular 2",
+    "dynamic forms",
+    "form library"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuizGsa21/ng2-magic-forms.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LuizGsa21/ng2-magic-forms/issues"
+  },
   "author": "Luiz Arantes Sa <LArantesSa@icloud.com>",
   "license": "MIT",
   "devDependencies": {
