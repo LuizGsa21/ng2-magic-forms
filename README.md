@@ -1,5 +1,5 @@
 # ng2-magic-forms
 
-Inspired by [angular-formly](https://github.com/formly-js/angular-formly).
+Inspired by <a href="https://github.com/formly-js/angular-formly">angular-formly</a>
 
 TODO: write docs
