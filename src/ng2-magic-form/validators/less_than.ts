@@ -21,7 +21,8 @@ export function lessThan (controlName: string): ValidatorFn {
         }
     };
     var getErrorMessage = (): {[key: string]: any} => {
-        return {lessThan: {value: selfValue, mustBeLessThan: otherValue, name: controlName}};
+        return {lessThan: {value: selfValue, mustBeLessThan: otherValue, name: controlName,
+            message: `This field should be less than ${controlName}`}};
     };
     return ControlHelper.observeControl(controlName, isValid, getErrorMessage);
 }

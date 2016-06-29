@@ -16,6 +16,13 @@ export function transformValidator(func: any) {
     };
 }
 
+export function transformValidatorInvoke(func: any): any {
+    return function (...args) {
+        return transformMessage(func.apply(null, args), args[args.length - 1]);
+    };
+}
+
+
 function getValidatorName(obj: any) {
     return Object.keys(obj)[0];
 }

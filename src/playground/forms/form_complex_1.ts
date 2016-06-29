@@ -1,6 +1,4 @@
 import {MagicValidators} from "../../ng2-magic-form/validators/index";
-import {Control} from "@angular/common";
-import {FormService} from "../../ng2-magic-form/services/form.service";
 import {MagicHelper} from "../../ng2-magic-form/magic_helper";
 export let FormComplex1 = [
     {
@@ -63,9 +61,7 @@ export let FormComplex1 = [
                 key: 'price',
                 type: 'inputGroup',
                 defaultValue: null,
-                validators: [
-                    // transformMessage(FormValidators.required, 'A name for the new Amenity is required')
-                ],
+                validators: [],
                 templateOptions: {
                     label: 'Price',
                     type: 'number',
@@ -78,7 +74,7 @@ export let FormComplex1 = [
                 type: 'inputGroup',
                 defaultValue: null,
                 validators: [
-                    // transformMessage(FormValidators.required, 'A name for the new Amenity is required')
+                    MagicValidators.lessThanTransform('price', 'this must be a number less than the price if entered')
                 ],
                 templateOptions: {
                     label: 'Optional Min Price',
