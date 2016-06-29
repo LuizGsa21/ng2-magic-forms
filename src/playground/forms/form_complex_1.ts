@@ -1,6 +1,7 @@
 import {MagicValidators} from "../../ng2-magic-form/validators/index";
 import {Control} from "@angular/common";
 import {FormService} from "../../ng2-magic-form/services/form.service";
+import {MagicHelper} from "../../ng2-magic-form/magic_helper";
 export let FormComplex1 = [
     {
         hostClassName: 'row',
@@ -47,9 +48,7 @@ export let FormComplex1 = [
         hostClassName: 'row',
         key: 'priceContainer',
         type: 'container',
-        hidden: (value: any, option: any, control: Control, form: FormService) => {
-            return form.getControl('showPriceOptions').value == 0;
-        },
+        hidden: MagicHelper.hideWhen('showPriceOptions').is('0'),
         children: [
             {
                 hostClassName: 'col-xs-12',
@@ -57,6 +56,53 @@ export let FormComplex1 = [
                 type: 'div',
                 templateOptions: {
                     html: `<strong>Note - Pricing for Amenities is a future enhancement to ClubReady, you can configure them now, the pricing is not currently implemented in the agreement process, it will be completed at a later date. Amenities are not sold on their own - they are always tied to sales package agreements. Any price is added on to the sales package price and the frequency of payment is the sales package frequency (most typically a $ charge every month - but dependant upon the sales package that grants the amenity)</strong>`
+                }
+            },
+            {
+                hostClassName: 'col-xs-12',
+                key: 'price',
+                type: 'inputGroup',
+                defaultValue: null,
+                validators: [
+                    // transformMessage(FormValidators.required, 'A name for the new Amenity is required')
+                ],
+                templateOptions: {
+                    label: 'Price',
+                    type: 'number',
+                    leftAddon: '$'
+                }
+            },
+            {
+                hostClassName: 'col-xs-12',
+                key: 'minPrice',
+                type: 'inputGroup',
+                defaultValue: null,
+                validators: [
+                    // transformMessage(FormValidators.required, 'A name for the new Amenity is required')
+                ],
+                templateOptions: {
+                    label: 'Optional Min Price',
+                    type: 'number',
+                    leftAddon: '$',
+                    description: '(ability to edit price is a permission)'
+                }
+            },
+            {
+                hostClassName: 'col-xs-12',
+                key: 'maxPrice',
+                type: 'inputGroup',
+                defaultValue: null,
+                validators: [
+                    // transformMessage(FormValidators.required, 'A name for the new Amenity is required')
+                ],
+                templateOptions: {
+                    className: 'row',
+                    leftSideClass: 'col-xs-6',
+                    rightSideClass: 'col-xs-6',
+                    label: 'Max Price',
+                    type: 'number',
+                    leftAddon: '$',
+                    description: '(ability to edit price is a permission)'
                 }
             }
         ]
