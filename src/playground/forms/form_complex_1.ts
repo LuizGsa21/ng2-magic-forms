@@ -63,6 +63,9 @@ export let FormComplex1 = [
                 defaultValue: null,
                 validators: [],
                 templateOptions: {
+                    className: 'row',
+                    leftSideClass: 'col-xs-3',
+                    rightSideClass: 'col-xs-4',
                     label: 'Price',
                     type: 'number',
                     leftAddon: '$'
@@ -74,9 +77,12 @@ export let FormComplex1 = [
                 type: 'inputGroup',
                 defaultValue: null,
                 validators: [
-                    MagicValidators.lessThanTransform('price', 'this must be a number less than the price if entered')
+                    MagicValidators.lessThanTransform('price', 'This must be less than the "Price" if entered.')
                 ],
                 templateOptions: {
+                    className: 'row',
+                    leftSideClass: 'col-xs-3',
+                    rightSideClass: 'col-xs-4',
                     label: 'Optional Min Price',
                     type: 'number',
                     leftAddon: '$',
@@ -89,12 +95,12 @@ export let FormComplex1 = [
                 type: 'inputGroup',
                 defaultValue: null,
                 validators: [
-                    // transformMessage(FormValidators.required, 'A name for the new Amenity is required')
+                    MagicValidators.greaterThanTransform('price', 'This must be greater than the "Price" if entered.')
                 ],
                 templateOptions: {
                     className: 'row',
-                    leftSideClass: 'col-xs-6',
-                    rightSideClass: 'col-xs-6',
+                    leftSideClass: 'col-xs-3',
+                    rightSideClass: 'col-xs-4',
                     label: 'Max Price',
                     type: 'number',
                     leftAddon: '$',
