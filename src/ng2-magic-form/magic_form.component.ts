@@ -58,6 +58,10 @@ export class MagicForm implements OnInit {
         return this._formOptions;
     }
 
+    get valid() {
+        return this.form.valid;
+    }
+
     get value() {
         return this.form.value;
     }
@@ -69,12 +73,16 @@ export class MagicForm implements OnInit {
     get debugValues() {
         return this._debug(this.form.value);
     }
-    
+
     get debugErrors() {
-        if (!this.form) return null;
+        return this._debug(this.form.errors);
+    }
+
+    get debugFormattedErrors() {
         let errors = Object.keys(this.form.controls)
             .map(this.formService.getControlErrors.bind(this.formService))
             .filter((value) => !!value && (value as any).length !== 0);
         return this._debug(errors);
     }
+
 }

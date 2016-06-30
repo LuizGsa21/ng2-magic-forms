@@ -28,8 +28,12 @@ export class FormService {
         return this._form.createControl(option);
     }
 
+    getErrors() {
+        return this._form.errors;
+    }
+    
     getControlErrors(controlName: string): IMagicError[] {
-        return this._form.getFormattedErrors(controlName);
+        return this._form.getControlFormattedErrors(controlName);
     }
 
     getControl(controlName: string) {

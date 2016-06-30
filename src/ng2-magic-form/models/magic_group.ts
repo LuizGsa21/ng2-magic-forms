@@ -1,5 +1,5 @@
 import {ControlGroup, AbstractControl, Validators} from "@angular/common";
-import {throwError, isEmpty} from "../util";
+import {throwError, isEmpty, isObject} from "../util";
 import {MagicControl} from "./magic_control";
 import {IOptionField} from "../magic_field.component";
 import {IMagicError} from "./magic_error";
@@ -39,7 +39,13 @@ export class MagicControlGroup extends ControlGroup {
         return control;
     }
 
-    getFormattedErrors(controlName: string): IMagicError[] {
+    get errors(): any[] {
+        return Object.keys(this.controls)
+            .map((controlName) => this.controls[controlName].errors)
+            .filter(isObject);
+    }
+
+    getControlFormattedErrors(controlName: string): IMagicError[] {
         let control = this.controls[controlName];
         if (!control || control.valid) {
             return [];
@@ -48,6 +54,7 @@ export class MagicControlGroup extends ControlGroup {
         return Object.keys(errors).map((key) => {
             return {
                 name: key,
+                controlName: controlName,
                 message: errors[key].message
             };
         })
@@ -55,7 +62,7 @@ export class MagicControlGroup extends ControlGroup {
 
 
     /**
-     * Wraps the validators providing access to the form service and the option field.
+     * Wraps the validators providing access to the form and the option field.
      * @private
      */
     _extendValidators (validators: any[], option: IOptionField): Function[] {
