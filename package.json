@@ -1,10 +1,11 @@
 {
   "name": "ng2-magic-forms",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
     "postinstall": "typings install",
+    "prepublish": "npm run build:tsc",
     "dist": "rimraf dist && webpack --config config/webpack.prod.js --progress --profile --bail",
     "build": "webpack --config config/webpack.dev.js --watch",
     "build:tsc": "rimraf lib && tsc -p src/ng2-magic-form",
