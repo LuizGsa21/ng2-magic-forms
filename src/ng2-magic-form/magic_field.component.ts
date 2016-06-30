@@ -15,7 +15,8 @@ import {throwError} from "rxjs/util/throwError";
 import {FieldTemplates} from "./templates/templates";
 import {isArray, isFunction, isEmpty} from "./util";
 import {FormService} from "./services/form.service";
-import {Control} from "@angular/common";
+import {Control, ControlGroup} from "@angular/common";
+import {MagicControl} from "./models/magic_control";
 
 
 /**
@@ -77,6 +78,7 @@ export class Field<T extends IField, U> implements OnInit, OnDestroy {
     templateOptions: U;
 
     control: Control;
+
     errors: any[];
 
     @ViewChild(ChildRef as Type)
@@ -178,67 +180,45 @@ export class MagicField extends Field<any, any> implements OnInit {
     }
 
     ngOnInit () {
+        if (!this.option) { throwError('Ahhh! no magic field option was found.'); }
+        // initialize option, control and listeners
         super.ngOnInit();
-        if (!this.option) {
-            throwError('Ahhh! no magic field option was found.');
-        }
-        let options = isArray(this.option) ? this.option : [this.option];
-        this.hostClassName = this.option.hostClassName || '';
-        // let options = (this.option as any).length ? this.option : [this.option];
-        // // console.log(options);
-        this.createTemplates(options as any);
-    }
-
-    createTemplates (options: IField[]) {
-        options.forEach((option) => this.createTemplate(option));
-    }
-
-    createTemplate (option: IField): any {
-        if (option.type == 'container') {
-            return this._createRecursive(option.children);
+        if (this.option.type == 'container') {
+            this._createContainer(this.option.children);
         } else {
-            let fieldConstructor = FieldTemplates[option.type];
+            let fieldConstructor = FieldTemplates[this.option.type];
             if (!fieldConstructor) {
-                throwError(`Template type '${option.type}' does not exit.`);
+                throwError(`Template type '${this.option.type}' does not existt.`);
             }
-            return this._createTemplate(fieldConstructor, option);
+            this._createTemplate(fieldConstructor);
         }
-
-        // let usesTransclusion = fieldConstructor.prototype.usesTransclusion;
-        // if (usesTransclusion) {
-        //     this._createTemplate(fieldConstructor, option);
-        // } else {
-        //     setTimeout(() => this._createTemplate(fieldConstructor, option))
-        // }
     }
 
-    createRecursiveTempate(options: any) {
-
-    }
-
-    _createTemplate (component: Function, option: IField) {
-        // console.debug('createTemplate() type:', option.type, 'options:', option, 'component', component);
+    _createTemplate (component: Function) {
         return this.componentResolver.resolveComponent(component).then((componentFactory: ComponentFactory<any>) => {
-            // console.log('this.childRef', this.childRef);
             let view = this.childRef.viewContainer.createComponent(componentFactory);
-            if (component === MagicField) {
-                view.instance.option = option.children;
-            } else {
-                view.instance.field = this.self;
-            }
+            view.instance.field = this.self;
         });
     }
 
-    private _createRecursive (children: IField[]) {
+    private _createContainer (children: IField[]) {
         if (isEmpty(children)) {
             throwError('Container type requires children elements');
         }
         return children.map((option) => {
             return this.componentResolver.resolveComponent(MagicField as Type).then((componentFactory: ComponentFactory<any>) => {
-                // console.log('this.childRef', this.childRef);
-                let view = this.childRef.viewContainer.createComponent(componentFactory);
-                view.instance.option = option;
+                let viewInstance = this.childRef.viewContainer.createComponent(componentFactory).instance;
+                viewInstance.option = option;
+                // A container sets its children's parent after the view has been initialized
+                setTimeout(() => this._setMagicParent(viewInstance));
             });
         });
+    }
+
+    private _setMagicParent(viewInstance: any) {
+        if (!viewInstance.control) {
+            throwError(`Ahhh! The view's control hasn't been created. You should report this bug.`);
+        }
+        viewInstance.control.magicParent = this.control;
     }
 }
