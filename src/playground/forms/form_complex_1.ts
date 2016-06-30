@@ -61,7 +61,9 @@ export let FormComplex1 = [
                 key: 'price',
                 type: 'inputGroup',
                 defaultValue: null,
-                validators: [],
+                validators: [
+                    MagicValidators.required
+                ],
                 templateOptions: {
                     className: 'row',
                     leftSideClass: 'col-xs-3',

@@ -1,10 +1,10 @@
 import {Component} from "@angular/core";
-import {IField} from "../magic_field.component";
+import {IOptionField} from "../magic_field.component";
 import {BaseTemplate} from "./base";
 import {DefaultLayout} from "./layout.default";
 
 
-export interface InputDefaultOptions extends IField {
+export interface InputDefaultOptions extends IOptionField {
     type: string,
     defaultValue?: string,
     label?: string,

@@ -7,7 +7,7 @@ import {FormComplex1} from "./forms/form_complex_1";
 // import {DynamicFormComponent} from "./dynamicForm";
 // import {FormValidators, transformMessage} from "./dynamicForm/formValidators";
 // import {Validators} from "@angular/common";
-// import {IField} from "./dynamicForm/templates/base";
+// import {IOptionField} from "./dynamicForm/templates/base";
 // import {TextareaField} from "./dynamicForm/templates/textareaField.template";
 // import {InputField} from "./dynamicForm/templates/inputField.template";
 
@@ -21,7 +21,7 @@ import {FormComplex1} from "./forms/form_complex_1";
 })
 export class AppComponent {
 
-    // fields: IField[];
+    // fields: IOptionField[];
     fields: any[];
 
     constructor () {

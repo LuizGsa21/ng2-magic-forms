@@ -1,6 +1,6 @@
 import {Component} from "@angular/core";
 import {FormService} from "../services/form.service";
-import {IField} from "../magic_field.component";
+import {IOptionField} from "../magic_field.component";
 import {DefaultLayout} from "./layout.default";
 import {BaseTemplate} from "./base";
 

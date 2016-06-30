@@ -2,7 +2,7 @@ import {Component, Input, OnInit, Output, EventEmitter} from "@angular/core";
 import {FORM_DIRECTIVES} from "@angular/common";
 import {FormService} from "./services/form.service";
 import {MagicControlGroup} from "./models/magic_group";
-import {MagicField, IField} from "./magic_field.component";
+import {MagicField, IOptionField} from "./magic_field.component";
 
 
 @Component({
@@ -37,7 +37,7 @@ export class MagicForm implements OnInit {
     @Output('onSubmit')
     onSubmit: EventEmitter<MagicControlGroup> = new EventEmitter<MagicControlGroup>();
 
-    _formOptions: IField[];
+    _formOptions: IOptionField[];
 
     constructor(private formService: FormService) {}
 
@@ -48,7 +48,7 @@ export class MagicForm implements OnInit {
 
 
     @Input('fields')
-    set formOptions(fields: IField[]) {
+    set formOptions(fields: IOptionField[]) {
         if (this._formOptions !== fields) {
             this._formOptions = fields;
         }

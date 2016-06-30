@@ -26,7 +26,6 @@ import {MagicControl} from "./models/magic_control";
  */
 @Directive({
     selector: '[childRef]',
-    // styles: [`:host { display: none; }`]
 })
 export class ChildRef {
     constructor (public viewContainer: ViewContainerRef) {}
@@ -36,7 +35,7 @@ export class ChildRef {
 /**
  * All templates/layouts must support these fields.
  */
-export interface IField {
+export interface IOptionField {
     // magic field class
     hostClassName?: string;
     // template root class
@@ -46,7 +45,7 @@ export interface IField {
     hidden?: any;
     validators?: any[];
     defaultValue?: any;
-    children?: IField[];
+    children?: IOptionField[];
 
     // custom fields used by templates/layouts
     templateOptions?: any;
@@ -58,7 +57,9 @@ export interface IField {
     onFocus: any;
 }
 
-export class Field<T extends IField, U> implements OnInit, OnDestroy {
+export class Field<T extends IOptionField, U> implements OnInit, OnDestroy {
+
+    parent: Field<any, any>;
 
     private _hostClassName = '';
 
@@ -122,9 +123,13 @@ export class Field<T extends IField, U> implements OnInit, OnDestroy {
     }
 
     registerListeners() {
+        this.syncErrors();
         this.control.valueChanges.subscribe((value) => {
             this.syncErrors();
             this._callEvent('valueChanges', value);
+        });
+        this.control.statusChanges.subscribe((status) => {
+            this._callEvent('statusChanges', status);
         });
     }
 
@@ -154,7 +159,6 @@ export class Field<T extends IField, U> implements OnInit, OnDestroy {
             return hidden;
         }
     }
-
 
     updateControl(value) {
         this.control.updateValue(value, {onlySelf: false, emitEvent: true, emitModelToViewChange: true});
@@ -201,7 +205,7 @@ export class MagicField extends Field<any, any> implements OnInit {
         });
     }
 
-    private _createContainer (children: IField[]) {
+    private _createContainer (children: IOptionField[]) {
         if (isEmpty(children)) {
             throwError('Container type requires children elements');
         }
@@ -209,16 +213,8 @@ export class MagicField extends Field<any, any> implements OnInit {
             return this.componentResolver.resolveComponent(MagicField as Type).then((componentFactory: ComponentFactory<any>) => {
                 let viewInstance = this.childRef.viewContainer.createComponent(componentFactory).instance;
                 viewInstance.option = option;
-                // A container sets its children's parent after the view has been initialized
-                setTimeout(() => this._setMagicParent(viewInstance));
+                viewInstance.parent = this.self;
             });
         });
-    }
-
-    private _setMagicParent(viewInstance: any) {
-        if (!viewInstance.control) {
-            throwError(`Ahhh! The view's control hasn't been created. You should report this bug.`);
-        }
-        viewInstance.control.magicParent = this.control;
     }
 }
