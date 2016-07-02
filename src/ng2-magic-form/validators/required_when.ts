@@ -1,5 +1,8 @@
 import {FormControl} from '@angular/forms';
-import {ControlHelper} from './shared';
+import {
+    ControlHelper,
+    ValidatorFn
+} from './shared';
 import {isEmpty} from '../util';
 
 
@@ -8,7 +11,7 @@ import {isEmpty} from '../util';
  * This is useful for fields that are required only when a specific option is set.
  * @param controlName - name of the control to observe for changes
  */
-export function requiredWhen (controlName: string) {
+export function requiredWhen (controlName: string): ValidatorFn {
     var isValid = (self: FormControl, control: FormControl): boolean => {
         var isRequired = control.value;
         if (isRequired == false) {
