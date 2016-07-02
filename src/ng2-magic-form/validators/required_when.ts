@@ -1,15 +1,7 @@
-import {Validators, Control} from "@angular/common";
-import {isPresent} from "../util";
-import {ControlHelper} from "./shared";
+import {FormControl} from '@angular/forms';
+import {ControlHelper} from './shared';
+import {isEmpty} from '../util';
 
-
-export function required(...args) {
-    let error = Validators.required.apply(this, args);
-    if (isPresent(error)) {
-        return {required: {message: 'This field is required.'}}
-    }
-    return null;
-}
 
 /**
  * Makes this Control required when its target has a truthy value.
@@ -17,9 +9,13 @@ export function required(...args) {
  * @param controlName - name of the control to observe for changes
  */
 export function requiredWhen (controlName: string) {
-    var isValid = (self: Control, control: Control): boolean => {
-        var isRequired = !!control.value;
-        return (isRequired) ? !!self.value : true;
+    var isValid = (self: FormControl, control: FormControl): boolean => {
+        var isRequired = control.value;
+        if (isRequired == false) {
+            return true;
+        }
+        return !isEmpty(self.value);
+
     };
     var getErrorMessage = (): {[key: string]: any} => {
         return {requiredWhen: {message: 'This field is required.'}};

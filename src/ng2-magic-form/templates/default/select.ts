@@ -1,11 +1,11 @@
-import {Component} from "@angular/core";
-import {DefaultLayout} from "./layout.default";
-import {BaseTemplate} from "./base";
+import {Component} from '@angular/core';
+import {DefaultLayout} from './_layout';
+import {BaseTemplate} from '../base.template';
+import {FormControlDirective} from '@angular/forms';
 
 export interface SelectFieldOptions {
     defaultValue?: string;
     label?: string;
-    className?: string;
     description?: string;
     options: Array<{value:string, text:string}>
 }
@@ -13,12 +13,13 @@ export interface SelectFieldOptions {
 @Component({
     selector: 'selectDefaultTemplate',
     directives: [
-        DefaultLayout
+        DefaultLayout,
+        FormControlDirective
     ],
     template: `
     <div defaultLayout [field]="field">
-         <label *ngIf="field.templateOptions.label" [attr.for]="field.option.key" class="control-label">{{ field.templateOptions.label }}</label>
-         <select [ngFormControl]="field.control" [id]="field.option.key" class="form-control">
+         <label *ngIf="field.templateOptions.label" [attr.for]="field.options.key" class="control-label">{{ field.templateOptions.label }}</label>
+         <select [formControl]="field.control" [id]="field.options.key" class="form-control">
             <option *ngFor="let option of field.templateOptions.options" [value]="option.value">{{ option.text }}</option>
          </select>
     </div>

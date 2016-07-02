@@ -1,0 +1,16 @@
+
+{
+  "compilerOptions": {
+    "target": "es5",
+    "moduleResolution": "node",
+    "declaration": true,
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "removeComments": true
+  },
+  "files": [
+    "src/ng2-magic-form/index.ts",
+    "typings/globals/core-js/index.d.ts"
+  ]
+}

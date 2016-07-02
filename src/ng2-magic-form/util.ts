@@ -65,3 +65,15 @@ export function extractRecursive (obj, propName, seed = []) {
 export function throwError (message) {
     throw Error(message);
 }
+
+export function debug (...args) {
+    console.log.apply(console, args);
+}
+
+export function print(...args) {
+    console.log.apply(console, args);
+}
+
+export function warn(...args) {
+    console.warn.apply(console, args);
+}

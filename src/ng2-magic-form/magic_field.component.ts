@@ -1,23 +1,53 @@
 import {
+    ViewContainerRef,
+    Directive,
     Component,
     Input,
-    OnInit,
-    ComponentResolver,
-    ComponentFactory,
-    Directive,
-    ViewContainerRef,
-    ViewChild,
-    Type,
     HostBinding,
-    OnDestroy
-} from "@angular/core";
-import {throwError} from "rxjs/util/throwError";
-import {FieldTemplates} from "./templates/templates";
-import {isArray, isFunction, isEmpty} from "./util";
-import {FormService} from "./services/form.service";
-import {Control, ControlGroup} from "@angular/common";
-import {MagicControl} from "./models/magic_control";
+    ComponentResolver,
+    Type,
+    ViewChild,
+    ComponentFactory,
+    OnInit
+} from '@angular/core';
+import {FormControl} from '@angular/forms';
+import {Form} from './form.service';
+import {TemplateConfig} from './templates/templates';
+import {
+    isBlank,
+    throwError,
+    isEmpty,
+    debug
+} from './util';
 
+
+export interface IOptionField {
+
+    key: string;
+    type: string;
+
+    hostClassName?: string;
+    layoutClassName?: string;
+    templateClassName?: string;
+
+    hidden?: any;
+    validators?: any[];
+    defaultValue?: any;
+    children?: IOptionField[];
+
+    /**
+     * Options defined by template and layout.
+     */
+    templateOptions?: any;
+
+    /**
+     * Field events
+     */
+    valueChanges: any;
+    onClick: any;
+    onBlur: any;
+    onFocus: any;
+}
 
 /**
  * Hack used to get reference of parent view.
@@ -28,147 +58,9 @@ import {MagicControl} from "./models/magic_control";
     selector: '[childRef]',
 })
 export class ChildRef {
-    constructor (public viewContainer: ViewContainerRef) {}
-}
-
-
-/**
- * All templates/layouts must support these fields.
- */
-export interface IOptionField {
-    // magic field class
-    hostClassName?: string;
-    // template root class
-    className?: string;
-    key: string;
-    type: string;
-    hidden?: any;
-    validators?: any[];
-    defaultValue?: any;
-    children?: IOptionField[];
-
-    // custom fields used by templates/layouts
-    templateOptions?: any;
-
-    // events
-    valueChanges: any;
-    onClick: any;
-    onBlur: any;
-    onFocus: any;
-}
-
-export class Field<T extends IOptionField, U> implements OnInit, OnDestroy {
-
-    parent: Field<any, any>;
-
-    private _hostClassName = '';
-
-    @HostBinding('class')
-    set hostClassName(value) {
-        this._hostClassName = value;
-    }
-
-    get hostClassName() {
-        let className = this._hostClassName || '';
-        return this.hidden ? className + ' hidden' : className;
-    }
-
-    @Input('option')
-    option: T;
-
-    templateOptions: U;
-
-    control: Control;
-
-    errors: any[];
-
-    @ViewChild(ChildRef as Type)
-    childRef: ChildRef;
-
-    self: this;
-
-    constructor(protected formService: FormService) {
-        this.self = this;
-    }
-
-    /**
-     * If your template uses transclusion this should always return true. Otherwise override this getter and return false.
-     * NOTE: when overriding, YOU HAVE TO USE A GETTER. We use the Classes prototype when validating.
-     *
-     * When a field does not use transclusion, its creation process is wrapped in a setTimeout call.
-     * This is required for the fields to maintain their order when rendered.
-     * @returns {boolean}
-     */
-    get usesTransclusion() {
-        return true;
-    }
-
-    ngOnInit() {
-        this.initOptions();
-        this.initControl();
-        this.registerListeners();
-    }
-
-    initOptions () {
-        this.hostClassName = this.option.hostClassName || '';
-        this.templateOptions = this.option.templateOptions;
-    }
-
-    initControl() {
-        this.control = this.formService.createControl(this.option);
-    }
-    
-    syncErrors() {
-        this.errors = this.formService.getControlErrors(this.option.key);
-    }
-
-    registerListeners() {
-        this.syncErrors();
-        this.control.valueChanges.subscribe((value) => {
-            this.syncErrors();
-            this._callEvent('valueChanges', value);
-        });
-        this.control.statusChanges.subscribe((status) => {
-            this._callEvent('statusChanges', status);
-        });
-    }
-
-    _callEvent(eventName: string, value: any) {
-        if (this.option[eventName]) {
-            return this.option[eventName](value, this.option, this.control, this.formService);
-        }
-    }
-
-    onClick(event: any) {
-        this._callEvent('onClick', event);
-    }
-
-    onBlur(event: any) {
-        this._callEvent('onBlur', event);
-    }
-
-    onFocus(event: any) {
-        this._callEvent('onFocus', event);
-    }
-
-    get hidden() {
-        let hidden = this.option.hidden;
-        if (isFunction(hidden)) {
-            return this._callEvent('hidden', this.control.value);
-        } else {
-            return hidden;
-        }
-    }
-
-    updateControl(value) {
-        this.control.updateValue(value, {onlySelf: false, emitEvent: true, emitModelToViewChange: true});
-    }
-
-    ngOnDestroy() {
-        this.self = null;
+    constructor (public viewContainer: ViewContainerRef) {
     }
 }
-
 
 @Component({
     selector: 'magicField',
@@ -177,44 +69,116 @@ export class Field<T extends IOptionField, U> implements OnInit, OnDestroy {
     ],
     template: `<div childRef></div>`
 })
-export class MagicField extends Field<any, any> implements OnInit {
+export class MagicField implements OnInit {
 
-    constructor (protected formService: FormService, protected componentResolver: ComponentResolver) {
-        super(formService);
-    }
+    /** @internal */
+    _parent: MagicField;
+    /** @internal */
+    _children: MagicField[] = [];
+
+    control: FormControl;
+
+    @ViewChild(ChildRef as Type)
+    childRef: ChildRef;
+
+    @Input('options')
+    options: IOptionField;
+
+    errors: any[];
+
+    constructor (public form: Form, private _componentResolver: ComponentResolver, private templateConfig: TemplateConfig) {}
 
     ngOnInit () {
-        if (!this.option) { throwError('Ahhh! no magic field option was found.'); }
-        // initialize option, control and listeners
-        super.ngOnInit();
-        if (this.option.type == 'container') {
-            this._createContainer(this.option.children);
-        } else {
-            let fieldConstructor = FieldTemplates[this.option.type];
-            if (!fieldConstructor) {
-                throwError(`Template type '${this.option.type}' does not existt.`);
-            }
-            this._createTemplate(fieldConstructor);
+        debug('MagicField.ngOnInit()', this.options.key, this);
+        this._initOptions();
+        this._initControl();
+        this._createView();
+    }
+
+    @HostBinding('class')
+    get hostClassName () {
+        return this.options.hostClassName || '';
+        // let className = this._hostClassName || '';
+        // return this.hidden ? className + ' hidden' : className;
+    }
+
+    get templateOptions () { return this.options.templateOptions }
+    
+    get value() { return this.control.value }
+
+    private _initOptions () {
+        if (isBlank(this.options.type)) {
+            debug(`The field option 'type' is missing:`, this.options);
+            throwError(`The field option 'type' is required...`);
+        }
+        if (isBlank(this.options.key)) {
+            debug(`The field option 'key' is missing:`, this.options);
+            throwError(`The field option 'key' is required...`);
         }
     }
 
-    _createTemplate (component: Function) {
-        return this.componentResolver.resolveComponent(component).then((componentFactory: ComponentFactory<any>) => {
+    private _initControl () {
+        if (isBlank(this.options)) {
+            throwError('field options not specified.')
+        }
+        this.control = this.form.createControl(this.options);
+        this.syncErrors();
+        this.control.valueChanges.subscribe(() => {
+            debug('valueChanges controlName:', this.options.key);
+            this.syncErrors();
+        });
+    }
+
+    syncErrors() {
+        this.errors = this.form.getControlErrors(this.options.key);
+    }
+    updateValue(value: any) {
+        this.control.updateValue(value, {onlySelf: false});
+    }
+
+    private _createView () {
+        if (this.options.type === 'container') {
+            if (isEmpty(this.options.children)) {
+                throwError(`The template type 'container' requires children fields`);
+            }
+            return this._createContainer(this.options.children);
+        } else {
+            let component = this.templateConfig._getTemplateComponent(this.options.type);
+            if (isBlank(component)) {
+                throwError(`Template type '${this.options.type}' does not exist.`);
+            }
+            this._createTemplate(component);
+        }
+    }
+
+    private _createTemplate (component: Function) {
+        return this._componentResolver.resolveComponent(component).then((componentFactory: ComponentFactory<any>) => {
             let view = this.childRef.viewContainer.createComponent(componentFactory);
-            view.instance.field = this.self;
+            view.instance.field = this;
         });
     }
 
     private _createContainer (children: IOptionField[]) {
-        if (isEmpty(children)) {
-            throwError('Container type requires children elements');
-        }
         return children.map((option) => {
-            return this.componentResolver.resolveComponent(MagicField as Type).then((componentFactory: ComponentFactory<any>) => {
-                let viewInstance = this.childRef.viewContainer.createComponent(componentFactory).instance;
-                viewInstance.option = option;
-                viewInstance.parent = this.self;
+            return this._componentResolver.resolveComponent(MagicField as Type).then((componentFactory: ComponentFactory<any>) => {
+                let viewInstance = this.childRef.viewContainer.createComponent(componentFactory).instance as MagicField;
+                this._children.push(viewInstance);
+                viewInstance.options = option;
+                viewInstance._parent = this;
             });
         });
     }
+
+    private _callEvent (eventName: string, value: any) {
+        if (this.options[eventName]) {
+            return this.options[eventName](value, this.control, this.options, this.form);
+        }
+    }
+
+    onClick (event: any) { this._callEvent('onClick', event); }
+
+    onBlur (event: any) { this._callEvent('onBlur', event); }
+
+    onFocus (event: any) { this._callEvent('onFocus', event); }
+
 }

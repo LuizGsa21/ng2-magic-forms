@@ -1,5 +1,8 @@
-import {Control} from "@angular/common";
-import {ValidatorFn, ControlHelper} from "./shared";
+import {FormControl} from '@angular/forms';
+import {
+    ValidatorFn,
+    ControlHelper
+} from './shared';
 
 
 /**
@@ -11,7 +14,7 @@ import {ValidatorFn, ControlHelper} from "./shared";
 export function lessThan (controlName: string): ValidatorFn {
     var selfValue: number;
     var otherValue: number;
-    var isValid = (self: Control, control: Control): boolean => {
+    var isValid = (self: FormControl, control: FormControl): boolean => {
         selfValue = parseFloat(self.value);
         otherValue = parseFloat(control.value);
         if (isNaN(selfValue) || isNaN(otherValue)) {

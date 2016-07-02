@@ -1,5 +1,5 @@
-import {Validators} from "@angular/common";
-import {isPresent} from "../util";
+import {Validators} from '@angular/forms';
+import {isPresent} from '../util';
 
 
 export function required(...args) {

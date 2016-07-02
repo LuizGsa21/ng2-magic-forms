@@ -1,5 +1,16 @@
-import {isBlank, isString, isFunction, throwError} from "../util";
-import {Control, ControlGroup, AbstractControl} from "@angular/common";
+import {
+    isBlank,
+    isString,
+    isFunction,
+    throwError,
+    debug
+} from '../util';
+import {
+    FormControl,
+    FormGroup,
+    AbstractControl
+} from '@angular/forms';
+
 function getObjectContainingMessage(obj) {
     return obj[Object.keys(obj)[0]];
 }
@@ -34,6 +45,7 @@ export function transformMessage(func: any, transformer: any) {
             return null;
         }
         let name = getValidatorName(error);
+        debug('transformMessage() name:', name, 'error:', error);
         if (isFunction(transformer)) {
             let errorTransformed = transformer(error);
             // only update the message property when the user returns a string
@@ -55,30 +67,30 @@ export function transformMessage(func: any, transformer: any) {
 
 
 export class ControlHelper {
-    static getControlGroup (control: Control): ControlGroup {
-        // sometimes root returns a Control, so we check by instance here.
-        return (<ControlGroup>control.root instanceof ControlGroup) ? <ControlGroup>control.root : null;
+    static getFormGroup (control: FormControl): FormGroup {
+        // sometimes root returns a FormControl, so we check by instance here.
+        return (<FormGroup>control.root instanceof FormGroup) ? <FormGroup>control.root : null;
     }
 
-    static getControlByName (controlGroup: ControlGroup, name: string): Control {
-        return (controlGroup.controls[name]) ? <Control>controlGroup.controls[name] : null;
+    static getFormControlByName (controlGroup: FormGroup, name: string): FormControl {
+        return (controlGroup.controls[name]) ? <FormControl>controlGroup.controls[name] : null;
     }
 
-    static findControl (control: Control, controlName: string): Control {
-        var controlGroup = ControlHelper.getControlGroup(control);
+    static findFormControl (control: FormControl, controlName: string): FormControl {
+        var controlGroup = ControlHelper.getFormGroup(control);
         if (!controlGroup) return null;
-        return ControlHelper.getControlByName(controlGroup, controlName);
+        return ControlHelper.getFormControlByName(controlGroup, controlName);
     }
 
 
     static observeControl (
         controlName: string,
-        isValid: (self?: Control, control?: Control) => boolean,
-        getErrorMessage: (self?: Control, control?: Control) => { [key: string]: any }
+        isValid: (self?: FormControl, control?: FormControl) => boolean,
+        getErrorMessage: (self?: FormControl, control?: FormControl) => { [key: string]: any }
     ): ValidatorFn {
         var hasRegistered = false;
-        return (self: Control): {[key: string]: any} => {
-            var control = ControlHelper.findControl(self, controlName);
+        return (self: FormControl): {[key: string]: any} => {
+            var control = ControlHelper.findFormControl(self, controlName);
             if (!control) {
                 return null;
             }

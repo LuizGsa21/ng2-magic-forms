@@ -1,23 +1,42 @@
-import {Component, Input, OnInit, Output, EventEmitter} from "@angular/core";
-import {FORM_DIRECTIVES} from "@angular/common";
-import {FormService} from "./services/form.service";
-import {MagicControlGroup} from "./models/magic_group";
-import {MagicField, IOptionField} from "./magic_field.component";
+import {
+    Component,
+    Input,
+    Output,
+    EventEmitter,
+    Self
+} from '@angular/core';
+import {
+    MagicField,
+    IOptionField
+} from './magic_field.component';
+import {
+    FormGroup,
+    REACTIVE_FORM_DIRECTIVES,
+    FORM_DIRECTIVES
+} from '@angular/forms';
+import {Form} from './form.service';
+import {
+    debug,
+    print,
+    isBlank,
+    isPresent
+} from './util';
 
 
 @Component({
     selector: 'magicForm',
     exportAs: 'magicForm',
     providers: [
-        FormService
+        Form
     ],
     directives: [
         FORM_DIRECTIVES,
+        REACTIVE_FORM_DIRECTIVES,
         MagicField
     ],
     template: `
-    <form *ngIf="formOptions" [ngFormModel]="form" (ngSubmit)="onSubmit.emit(form)">
-      <magicField *ngFor="let formOption of formOptions" [option]="formOption"></magicField>
+    <form *ngIf="formOptions" [formGroup]="form" (ngSubmit)="onSubmit.emit(form)">
+      <magicField *ngFor="let formOption of formOptions" [options]="formOption"></magicField>
       <ng-content></ng-content>
 <pre>
 Is form valid? {{ valid }}
@@ -30,59 +49,34 @@ Form errors:
     </form>
 `
 })
-export class MagicForm implements OnInit {
-
-    form: MagicControlGroup;
-
-    @Output('onSubmit')
-    onSubmit: EventEmitter<MagicControlGroup> = new EventEmitter<MagicControlGroup>();
-
-    _formOptions: IOptionField[];
-
-    constructor(private formService: FormService) {}
-
-    ngOnInit() {
-        this.formService.init();
-        this.form = this.formService.getForm();
-    }
-
+export class MagicForm {
 
     @Input('fields')
-    set formOptions(fields: IOptionField[]) {
-        if (this._formOptions !== fields) {
-            this._formOptions = fields;
+    formOptions: IOptionField[];
+
+    @Output('onSubmit')
+    onSubmit: EventEmitter<FormGroup> = new EventEmitter<FormGroup>();
+
+    constructor (@Self() public form: Form) {  }
+
+    ngOnInit() {
+        debug('Created MagicForm:', this);
+        if (isBlank(this.formOptions)) {
+            print('No form options specified!!');
         }
     }
+    get valid () { return this.form.valid; }
 
-    get formOptions() {
-        return this._formOptions;
-    }
+    get value () { return this.form.value; }
 
-    get valid() {
-        return this.form.valid;
-    }
+    private _debug (obj?: any) { return JSON.stringify(obj, null, 2); }
 
-    get value() {
-        return this.form.value;
-    }
+    get debugValues () { return this._debug(this.form.value); }
 
-    private _debug(obj?:any) {
-        return JSON.stringify(obj, null, 2)
-    }
-
-    get debugValues() {
-        return this._debug(this.form.value);
-    }
-
-    get debugErrors() {
-        return this._debug(this.form.errors);
-    }
-
-    get debugFormattedErrors() {
-        let errors = Object.keys(this.form.controls)
-            .map(this.formService.getControlErrors.bind(this.formService))
-            .filter((value) => !!value && (value as any).length !== 0);
+    get debugErrors () {
+        let errors = Object.keys(this.form.controls).map((controlName) => {
+            return this.form.controls[controlName].errors
+        }).filter(isPresent);
         return this._debug(errors);
     }
-
 }

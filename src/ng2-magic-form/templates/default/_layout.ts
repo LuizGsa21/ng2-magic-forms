@@ -1,10 +1,10 @@
-import {Component} from "@angular/core";
-import {BaseLayout} from "./layout.base";
+import {Component} from '@angular/core';
+import {BaseLayout} from '../base.layout';
 
 @Component({
     selector: '[defaultLayout]',
-    template: 
-`<div *ngIf="!field.hidden" class="form-group" [class.has-error]="!field.control.valid && field.control.touched">
+    template:
+        `<div *ngIf="!field.hidden" class="form-group" [class.has-error]="!field.control.valid && field.control.touched">
   <ng-content></ng-content>
   <div *ngIf="!field.control.valid && field.control.touched">
     <div *ngFor="let error of field.errors" class="help-block">{{ error.message }}</div>

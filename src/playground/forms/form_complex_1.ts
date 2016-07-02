@@ -1,40 +1,58 @@
-import {MagicValidators} from "../../ng2-magic-form/validators/index";
-import {MagicHelper} from "../../ng2-magic-form/magic_helper";
+import {MagicValidators} from '../../ng2-magic-form/validators/index';
 export let FormComplex1 = [
+    /**
+     * Amenity Name
+     */
     {
-        hostClassName: 'row',
-        className: 'col-xs-12',
+        hostClassName: 'col-xs-12 hostClassName',
+        templateClassName: 'row templateClassName',
+        layoutClassName: 'col-xs-12 layoutClassName',
+
         key: 'amenityName',
         type: 'input',
         defaultValue: null,
         validators: [
             MagicValidators.requiredTransform('A name for the new Amenity is required')
         ],
+        
         templateOptions: {
             label: 'Name of The New Amenity',
             type: 'text',
             description: 'eg Tanning, Free Towels, Sauna, VIP pass'
         }
     },
+    /**
+     * Amenity Description
+     */
     {
-        hostClassName: 'row',
-        className: 'col-xs-12',
-        key: 'amenityDetail',
+        hostClassName: 'col-xs-12 hostClassName',
+        templateClassName: 'row templateClassName',
+        layoutClassName: 'col-xs-12 layoutClassName',
+
+        key: 'amenityDescription',
         type: 'textarea',
         defaultValue: null,
         validators: [],
+        
         templateOptions: {
             label: 'Amenity Description',
             placeholder: 'Optional',
             rows: 3
         }
     },
+
+    /**
+     * Show price options
+     */
     {
-        hostClassName: 'row',
-        className: 'col-xs-12',
+        hostClassName: 'col-xs-12 hostClassName',
+        templateClassName: 'row templateClassName',
+        layoutClassName: 'col-xs-12 layoutClassName',
+
         key: 'showPriceOptions',
         type: 'radio',
-        defaultValue: '1',
+        defaultValue: '0',
+        
         templateOptions: {
             radios: [
                 {value: '0', text: 'This amenity has no directly associated price'},
@@ -42,48 +60,73 @@ export let FormComplex1 = [
             ]
         }
     },
+    /**
+     * Price Container
+     */
     {
-        hostClassName: 'row',
-        key: 'priceContainer',
+        hostClassName: 'col-xs-12 hostClassName',
+        templateClassName: 'row templateClassName',
+        layoutClassName: 'col-xs-12 layoutClassName',
+
+        key: 'container1',
         type: 'container',
-        hidden: MagicHelper.hideWhen('showPriceOptions').is('0'),
+
         children: [
+            /**
+             * Amenity Price info
+             */
             {
-                hostClassName: 'col-xs-12',
+                hostClassName: 'col-xs-12 hostClassName',
+                templateClassName: 'row templateClassName',
+                layoutClassName: 'col-xs-12 layoutClassName',
+
                 key: 'priceAmenityInfo',
                 type: 'div',
+
                 templateOptions: {
                     html: `<strong>Note - Pricing for Amenities is a future enhancement to ClubReady, you can configure them now, the pricing is not currently implemented in the agreement process, it will be completed at a later date. Amenities are not sold on their own - they are always tied to sales package agreements. Any price is added on to the sales package price and the frequency of payment is the sales package frequency (most typically a $ charge every month - but dependant upon the sales package that grants the amenity)</strong>`
                 }
             },
+            /**
+             * Amenity Price
+             */
             {
-                hostClassName: 'col-xs-12',
+                // hostClassName: 'col-xs-12 hostClassName',
+                templateClassName: 'row templateClassName',
+                layoutClassName: 'col-xs-12 layoutClassName',
+
                 key: 'price',
                 type: 'inputGroup',
                 defaultValue: null,
                 validators: [
-                    MagicValidators.required
+                    MagicValidators.requiredWhen('showPriceOptions', 'Price field is required.')
                 ],
+
                 templateOptions: {
-                    className: 'row',
-                    leftSideClass: 'col-xs-3',
+                    leftSideClass: 'col-xs-4',
                     rightSideClass: 'col-xs-4',
                     label: 'Price',
                     type: 'number',
                     leftAddon: '$'
                 }
             },
+            /**
+             * Amenity min price
+             */
             {
-                hostClassName: 'col-xs-12',
+                // hostClassName: 'col-xs-12 hostClassName',
+                templateClassName: 'row templateClassName',
+                layoutClassName: 'col-xs-12 layoutClassName',
+
                 key: 'minPrice',
                 type: 'inputGroup',
                 defaultValue: null,
                 validators: [
                     MagicValidators.lessThanTransform('price', 'This must be less than the "Price" if entered.')
                 ],
+
                 templateOptions: {
-                    className: 'row',
-                    leftSideClass: 'col-xs-3',
+                    leftSideClass: 'col-xs-4',
                     rightSideClass: 'col-xs-4',
                     label: 'Optional Min Price',
                     type: 'number',
@@ -91,31 +134,41 @@ export let FormComplex1 = [
                     description: '(ability to edit price is a permission)'
                 }
             },
+            /**
+             * Aminity max price
+             */
             {
-                hostClassName: 'col-xs-12',
+                // hostClassName: 'col-xs-12 hostClassName',
+                templateClassName: 'row templateClassName',
+                layoutClassName: 'col-xs-12 layoutClassName',
+
                 key: 'maxPrice',
                 type: 'inputGroup',
                 defaultValue: null,
                 validators: [
                     MagicValidators.greaterThanTransform('price', 'This must be greater than the "Price" if entered.')
                 ],
+
                 templateOptions: {
-                    className: 'row',
-                    leftSideClass: 'col-xs-3',
+                    leftSideClass: 'col-xs-4',
                     rightSideClass: 'col-xs-4',
-                    label: 'Max Price',
+                    label: 'Optional Max Price',
                     type: 'number',
                     leftAddon: '$',
                     description: '(ability to edit price is a permission)'
                 }
-            }
+            },
         ]
     },
     {
-        hostClassName: 'row',
+        // hostClassName: 'col-xs-12 hostClassName',
+        templateClassName: 'row templateClassName',
+        layoutClassName: 'col-xs-12 layoutClassName',
+
         key: 'discountId',
         type: 'select',
         defaultValue: '0',
+
         templateOptions: {
             className: 'col-xs-12',
             options: [
@@ -127,4 +180,6 @@ export let FormComplex1 = [
             ]
         }
     },
-]; 
+
+
+];
