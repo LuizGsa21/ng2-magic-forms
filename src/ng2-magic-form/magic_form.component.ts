@@ -64,6 +64,7 @@ export class MagicForm {
         if (isBlank(this.formOptions)) {
             print('No form options specified!!');
         }
+        (window as any).debugForm = this.form;
     }
     get valid () { return this.form.valid; }
 

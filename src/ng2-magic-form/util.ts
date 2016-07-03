@@ -35,6 +35,10 @@ export function has(obj: any, key: string) {
     return obj != null && obj.hasOwnProperty(key);
 }
 
+export function normalizeBool(obj: any) {
+    return obj == null ? false : obj;
+}
+
 export function isArrayLike(obj: any) {
     return has(obj, 'length');
 }

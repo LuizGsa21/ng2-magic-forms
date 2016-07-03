@@ -8,7 +8,8 @@ import {
     Type,
     ViewChild,
     ComponentFactory,
-    OnInit
+    OnInit,
+    OnDestroy
 } from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {Form} from './form.service';
@@ -17,9 +18,9 @@ import {
     isBlank,
     throwError,
     isEmpty,
-    debug
+    debug,
+    normalizeBool
 } from './util';
-
 
 export interface IOptionField {
 
@@ -47,6 +48,8 @@ export interface IOptionField {
     onClick: any;
     onBlur: any;
     onFocus: any;
+
+
 }
 
 /**
@@ -69,14 +72,8 @@ export class ChildRef {
     ],
     template: `<div childRef></div>`
 })
-export class MagicField implements OnInit {
+export class MagicField implements OnInit, OnDestroy {
 
-    /** @internal */
-    _parent: MagicField;
-    /** @internal */
-    _children: MagicField[] = [];
-
-    control: FormControl;
 
     @ViewChild(ChildRef as Type)
     childRef: ChildRef;
@@ -84,7 +81,48 @@ export class MagicField implements OnInit {
     @Input('options')
     options: IOptionField;
 
+    control: FormControl;
+
     errors: any[];
+
+    parent: MagicField;
+    children: MagicField[] = [];
+
+    _hidden: boolean;
+    // is true when any of its parents is hidden
+    _isParentHidden: boolean;
+    private isAfterViewInit;
+
+
+    @HostBinding('style.display')
+    get hideSelf() {
+        return this.options.hidden ? 'none' : '';
+    }
+
+    get hidden(): boolean {
+        // Always do a check before returning because the user may change the status at any given time.
+        this.hidden = this.options.hidden;
+        return this._isParentHidden ? true : this._hidden;
+    }
+
+    includeOrExclude() {
+        // ignore all calls before afterViewInit
+        if (!this.isAfterViewInit) return;
+        if (this._isParentHidden || this._hidden) {
+            this.form.removeControl(this.options.key);
+        } else {
+            this.form.registerControl(this.options.key, this.control);
+        }
+    }
+
+    set hidden(value: boolean) {
+        value = normalizeBool(value);
+        if (value !== this._hidden) {
+            this._hidden = value;
+            this.includeOrExclude();
+            this.notifyChildren();
+        }
+    }
 
     constructor (public form: Form, private _componentResolver: ComponentResolver, private templateConfig: TemplateConfig) {}
 
@@ -96,15 +134,52 @@ export class MagicField implements OnInit {
     }
 
     @HostBinding('class')
-    get hostClassName () {
-        return this.options.hostClassName || '';
-        // let className = this._hostClassName || '';
-        // return this.hidden ? className + ' hidden' : className;
-    }
+    get hostClassName () { return this.options.hostClassName || ''; }
 
     get templateOptions () { return this.options.templateOptions }
     
     get value() { return this.control.value }
+
+    syncErrors() {
+        this.errors = this.form.getControlErrors(this.options.key);
+    }
+    updateValue(value: any) {
+        this.control.updateValue(value, {onlySelf: false});
+    }
+
+    parentStatusChanged() {
+        if (this._isParentHidden == this.parent.hidden) {
+            throwError('parentStatusChanged() was called but parent never changed.... you should report this bug.');
+        }
+        this._isParentHidden = this.parent.hidden;
+        this.includeOrExclude();
+    }
+
+    notifyChildren() {
+        if (isEmpty(this.children)) {
+            return; // do nothing
+        }
+        this.children.forEach((field) => {
+            field.parentStatusChanged();
+            field.notifyChildren();
+        });
+    }
+
+    ngAfterViewInit() {
+        this.isAfterViewInit = true;
+        setTimeout(() => this.notifyChildren());
+    }
+
+    onClick (event: any) { this._callEvent('onClick', event); }
+
+    onBlur (event: any) { this._callEvent('onBlur', event); }
+
+    onFocus (event: any) { this._callEvent('onFocus', event); }
+
+    ngOnDestroy() {
+        this.parent = null;
+        this.children = null;
+    }
 
     private _initOptions () {
         if (isBlank(this.options.type)) {
@@ -115,6 +190,7 @@ export class MagicField implements OnInit {
             debug(`The field option 'key' is missing:`, this.options);
             throwError(`The field option 'key' is required...`);
         }
+        this.hidden = this.options.hidden = !!this.options.hidden;
     }
 
     private _initControl () {
@@ -127,13 +203,6 @@ export class MagicField implements OnInit {
             debug('valueChanges controlName:', this.options.key);
             this.syncErrors();
         });
-    }
-
-    syncErrors() {
-        this.errors = this.form.getControlErrors(this.options.key);
-    }
-    updateValue(value: any) {
-        this.control.updateValue(value, {onlySelf: false});
     }
 
     private _createView () {
@@ -162,9 +231,9 @@ export class MagicField implements OnInit {
         return children.map((option) => {
             return this._componentResolver.resolveComponent(MagicField as Type).then((componentFactory: ComponentFactory<any>) => {
                 let viewInstance = this.childRef.viewContainer.createComponent(componentFactory).instance as MagicField;
-                this._children.push(viewInstance);
+                this.children.push(viewInstance);
                 viewInstance.options = option;
-                viewInstance._parent = this;
+                viewInstance.parent = this;
             });
         });
     }
@@ -174,11 +243,4 @@ export class MagicField implements OnInit {
             return this.options[eventName](value, this.control, this.options, this.form);
         }
     }
-
-    onClick (event: any) { this._callEvent('onClick', event); }
-
-    onBlur (event: any) { this._callEvent('onBlur', event); }
-
-    onFocus (event: any) { this._callEvent('onFocus', event); }
-
 }
