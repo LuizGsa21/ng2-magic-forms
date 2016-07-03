@@ -1,40 +1,4 @@
 import {isEmpty} from './util';
-export interface IIOptionField {
-
-    key: string;
-    type: string;
-
-    hostClassName?: string;
-    layoutClassName?: string;
-    templateClassName?: string;
-
-    hidden?: any;
-    validators?: any[];
-    defaultValue?: any;
-    children?: IIOptionField[];
-
-    /**
-     * Options defined by template and layout.
-     */
-    templateOptions?: any;
-
-    /**
-     * Field events
-     */
-    valueChanges: any;
-    onClick: any;
-    onBlur: any;
-    onFocus: any;
-}
-
-
-export class FieldOptions  {
-
-    constructor(options: IIOptionField) {
-        
-    }
-
-}
 
 export class Field {
 

@@ -1,4 +1,5 @@
-import {Field} from '../src/ng2-magic-form/magic';
+import {Field} from '../src/ng2-magic-form/field';
+
 describe('Field', () => {
 
     let field: Field;
