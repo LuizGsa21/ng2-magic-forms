@@ -3,21 +3,17 @@ import {
     HostBinding
 } from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {
-    MagicField,
-    IOptionField
-} from '../magic_field.component';
+import {IOptionField} from '../magic_field.component';
+import {MagicControl} from '../magic_control';
 
 
 export class BaseTemplate {
 
     @Input('field')
-    field: MagicField;
-
-    constructor () {}
+    field: MagicControl;
 
     @HostBinding('class')
-    get className () { return this.field.options.templateClassName || ''; }
+    get className () { return this.field.templateClassName; }
     get control (): FormControl { return this.field.control; }
     get templateOptions (): IOptionField { return this.field.templateOptions; }
     get options () { return this.field.options; }

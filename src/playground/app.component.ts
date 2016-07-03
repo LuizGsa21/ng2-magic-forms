@@ -16,10 +16,10 @@ import {TemplateConfig} from '../ng2-magic-form/templates/templates';
 })
 export class AppComponent {
 
-    fields: any[];
+    formOptions: any[];
 
     constructor () {
-        this.fields = FormComplex1;
+        this.formOptions = FormComplex1;
     }
 
     submit (event) {

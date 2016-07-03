@@ -64,7 +64,7 @@ export let FormComplex1 = [
      * Price Container
      */
     {
-        hostClassName: 'col-xs-12 hostClassName',
+        hostClassName: 'col-xs-12 container1 hostClassName',
         templateClassName: 'row templateClassName',
         layoutClassName: 'col-xs-12 layoutClassName',
 

@@ -1,6 +1,10 @@
-import {isEmpty} from './util';
+import {
+    isEmpty,
+    normalizeBool,
+    warn
+} from './util';
 
-export class Field {
+export class Field{
 
     /** @internal */
     _parent: Field;
@@ -12,18 +16,21 @@ export class Field {
     _isParentHidden: boolean;
 
 
-    get hidden() { return this._isParentHidden ? true : this._hidden; }
-    
-    set hidden(value: boolean) {
+    public get hidden() { return this._isParentHidden ? true : this._hidden; }
+
+    public set hidden(value: boolean) {
+        value = !!normalizeBool(value);
         if (this._hidden !== value) {
-            this._hidden = !!value;
+            this._hidden = value;
             this.notifyChildren();
         }
     }
     
     setParent(parent: Field) {
-        this._parent = parent;
-        this._isParentHidden = parent.hidden;
+        if (this._parent !== parent) {
+            this._parent = parent;
+            this.parentStatusChanged();
+        }
     }
     
     addChild(child: Field) {
@@ -32,6 +39,9 @@ export class Field {
     }
     
     parentStatusChanged() {
+        if (this._isParentHidden === this._parent.hidden) {
+            warn('parentStatusChanged() was called but parent never changed.... you should report this bug.');
+        }
         this._isParentHidden = this._parent.hidden;
         this.notifyChildren();
     }

@@ -6,7 +6,7 @@ import {
     Self
 } from '@angular/core';
 import {
-    MagicField,
+    MagicViewFactory,
     IOptionField
 } from './magic_field.component';
 import {
@@ -21,6 +21,7 @@ import {
     isBlank,
     isPresent
 } from './util';
+import {MagicControl} from './magic_control';
 
 
 @Component({
@@ -32,11 +33,11 @@ import {
     directives: [
         FORM_DIRECTIVES,
         REACTIVE_FORM_DIRECTIVES,
-        MagicField
+        MagicViewFactory
     ],
     template: `
     <form *ngIf="formOptions" [formGroup]="form" (ngSubmit)="onSubmit.emit(form)">
-      <magicField *ngFor="let formOption of formOptions" [options]="formOption"></magicField>
+      <magicField *ngFor="let field of fields" [field]="field"></magicField>
       <ng-content></ng-content>
 <pre>
 Is form valid? {{ valid }}
@@ -51,8 +52,9 @@ Form errors:
 })
 export class MagicForm {
 
-    @Input('fields')
+    @Input('options')
     formOptions: IOptionField[];
+    fields: MagicControl[] = [];
 
     @Output('onSubmit')
     onSubmit: EventEmitter<FormGroup> = new EventEmitter<FormGroup>();
@@ -64,8 +66,14 @@ export class MagicForm {
         if (isBlank(this.formOptions)) {
             print('No form options specified!!');
         }
+        this.fields = this.createFields(this.formOptions);
         (window as any).debugForm = this.form;
     }
+
+    createFields(formOptions: IOptionField[]): MagicControl[] {
+        return formOptions.map((options) => new MagicControl(options, this.form));
+    }
+
     get valid () { return this.form.valid; }
 
     get value () { return this.form.value; }
