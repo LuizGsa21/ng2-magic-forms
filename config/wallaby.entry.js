@@ -14,6 +14,8 @@ require('zone.js/dist/async-test');
 require('zone.js/dist/fake-async-test');
 require('zone.js/dist/sync-test');
 
+require('jasmine-expect');
+
 var testing = require('@angular/core/testing');
 
 var testingBrowser = require('@angular/platform-browser-dynamic/testing');

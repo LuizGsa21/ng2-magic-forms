@@ -23,8 +23,11 @@ module.exports = function (wallaby) {
       {pattern: 'test/**/*.spec.ts', load: false}
     ],
 
-    testFramework: "jasmine",
-
+    frameworks: [
+      'jasmine-matchers'
+    ],
+    testFramework: 'jasmine@2.4.1',
+    // debug: true,
     postprocessor: wallabyWebpack({
       entryPatterns: [
         'config/wallaby.entry.js',
