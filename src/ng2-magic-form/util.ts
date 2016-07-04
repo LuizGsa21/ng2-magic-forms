@@ -6,6 +6,8 @@ export function isBlank (obj: any): boolean {
     return obj === undefined || obj === null;
 }
 
+export function noop() {}
+
 export function isBoolean (obj: any): boolean {
     return typeof obj === "boolean";
 }
@@ -41,6 +43,13 @@ export function normalizeBool(obj: any) {
 
 export function isArrayLike(obj: any) {
     return has(obj, 'length');
+}
+
+export function isPromise(obj: any) {
+    return obj && obj.then;
+}
+export function isObservable(obj: any) {
+    return obj && obj.subscribe;
 }
 
 export function  isArguments(obj) {

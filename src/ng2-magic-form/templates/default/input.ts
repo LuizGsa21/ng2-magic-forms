@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {BaseTemplate} from '../base.template';
 import {DefaultLayout} from './_layout';
 import {FormControlDirective} from '@angular/forms';
+import {AsyncOrValuePipe} from '../../pipes/async';
 
 
 export interface InputDefaultOptions {
@@ -20,10 +21,12 @@ export interface InputDefaultOptions {
         DefaultLayout,
         FormControlDirective
     ],
+    pipes: [
+        AsyncOrValuePipe
+    ],
     template: `
     <div defaultLayout [field]="field">
-     <label *ngIf="field.templateOptions.label" [attr.for]="field.options.key" class="control-label">{{ field.templateOptions.label }}</label>
-     test
+     <label [style.display]="(field.templateOptions.label | asyncOrValue) ? null : 'none'" [attr.for]="field.options.key" class="control-label">{{ field.templateOptions.label | asyncOrValue }}</label>
      <input #f
         [formControl]="field.control"
         (click)="field.onClick(f.value, $event)" 
@@ -31,9 +34,12 @@ export interface InputDefaultOptions {
         (focus)="field.onFocus(f.value, $event)" 
         [type]="field.templateOptions.type" 
         [id]="field.options.key" 
-        [placeholder]="field.templateOptions.placeholder || ''" class="form-control">
+        [placeholder]="field.templateOptions.placeholder | asyncOrValue" class="form-control">
     </div>
 `
 })
 export class InputDefaultTemplate extends BaseTemplate {
+    constructor() {
+        super();
+    }
 }

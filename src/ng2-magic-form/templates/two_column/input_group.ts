@@ -43,4 +43,8 @@ export interface InputGroupTwoColumnTemplate extends TwoColumnTemplate {
 `
 
 })
-export class InputGroupInlineTemplate extends BaseTemplate {}
+export class InputGroupInlineTemplate extends BaseTemplate {
+    constructor() {
+        super();
+    }
+}

@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {DefaultLayout} from './_layout';
 import {BaseTemplate} from '../base.template';
 import {FormControlDirective} from '@angular/forms';
+import {AsyncOrValuePipe} from '../../pipes/async';
 
 export interface SelectFieldOptions {
     defaultValue?: string;
@@ -16,9 +17,12 @@ export interface SelectFieldOptions {
         DefaultLayout,
         FormControlDirective
     ],
+    pipes: [
+        AsyncOrValuePipe
+    ],
     template: `
     <div defaultLayout [field]="field">
-         <label *ngIf="field.templateOptions.label" [attr.for]="field.options.key" class="control-label">{{ field.templateOptions.label }}</label>
+         <label *ngIf="field.templateOptions.label | asyncOrValue" [attr.for]="field.options.key" class="control-label">{{ field.templateOptions.label | asyncOrValue}}</label>
          <select #f
             [formControl]="field.control" 
             [id]="field.options.key"
@@ -26,9 +30,13 @@ export interface SelectFieldOptions {
             (blur)="field.onBlur(f.value, $event)" 
             (focus)="field.onFocus(f.value, $event)"
              class="form-control">
-            <option *ngFor="let option of field.templateOptions.options" [value]="option.value">{{ option.text }}</option>
+            <option *ngFor="let option of field.templateOptions.options | asyncOrValue" [value]="option.value">{{ option.text }}</option>
          </select>
     </div>
 `
 })
-export class SelectDefaultTemplate extends BaseTemplate {}
+export class SelectDefaultTemplate extends BaseTemplate {
+    constructor() {
+        super();
+    }
+}

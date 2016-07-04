@@ -1,6 +1,6 @@
 <div class="container">
   hello world
-  <magicForm [options]="formOptions">
+  <magicForm #f="magicForm" [options]="formOptions" (onSubmit)="submit(f.value)">
     <button>FormBasic1</button>
   </magicForm>
 </div>

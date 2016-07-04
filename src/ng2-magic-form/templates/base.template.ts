@@ -17,4 +17,17 @@ export class BaseTemplate {
     get control (): FormControl { return this.field.control; }
     get templateOptions (): IOptionField { return this.field.templateOptions; }
     get options () { return this.field.options; }
+
+    ngOnInit() {
+        this.normalizeOptions();
+    }
+
+    /**
+     * Normalize template options
+     */
+    normalizeOptions() {
+        let options = this.field.templateOptions;
+        ['label', 'placeholder', 'description']
+            .forEach((propName) => options[propName] = options[propName] || '');
+    }
 }

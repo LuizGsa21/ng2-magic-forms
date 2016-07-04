@@ -19,7 +19,8 @@ import {
     debug,
     print,
     isBlank,
-    isPresent
+    isPresent,
+    isEmpty
 } from './util';
 import {MagicControl} from './magic_control';
 
@@ -83,7 +84,7 @@ export class MagicForm {
     get debugValues () { return this._debug(this.form.value); }
 
     get debugErrors () {
-        return this._debug(this.fields.map((field: any) => {
+        function transformFields(field: any) {
             return {
                 key: field.key,
                 hidden: field.hidden,
@@ -92,9 +93,11 @@ export class MagicForm {
                 value: field.value,
                 valid: field.valid,
                 errors: field.errors,
-                'options.hidden': field.options.hidden
+                'options.hidden': field.options.hidden,
+                children: isEmpty(field._children) ? null : field._children.map(transformFields)
             }
-        }));
+        }
+        return this._debug(this.fields.map(transformFields));
     }
 
 }

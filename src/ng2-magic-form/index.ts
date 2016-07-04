@@ -1,3 +1,8 @@
+/**
+ * @module
+ * @description
+ * Entry point from which you should import all public APIs.
+ */
 export * from "./templates";
 export * from "./validators";
 export * from "./magic_form.component";

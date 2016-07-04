@@ -1,5 +1,6 @@
 import {MagicValidators} from '../../ng2-magic-form/validators/index';
 import {MagicControl} from '../../ng2-magic-form/magic_control';
+import {Observable} from 'rxjs/Rx';
 export let FormComplex1 = [
     /**
      * Amenity Name
@@ -17,7 +18,15 @@ export let FormComplex1 = [
         ],
         
         templateOptions: {
-            label: 'Name of The New Amenity',
+            // label: 'Name of The New Amenity',
+            // add asynchronous text
+            label: Observable.create((obs) => {
+                obs.next(null);
+                setTimeout(() => {
+                    obs.next('Name of The New Amenity (This was added async)');
+                    obs.complete();
+                }, 1000)
+            }).share(),
             type: 'text',
             description: 'eg Tanning, Free Towels, Sauna, VIP pass'
         }
@@ -62,7 +71,6 @@ export let FormComplex1 = [
             } else {
                 control.options.hidden = false;
             }
-            console.log('control.options.hidden', control.options.hidden);
         },
 
         templateOptions: {

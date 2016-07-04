@@ -4,7 +4,8 @@ import {
     isBlank,
     debug,
     throwError,
-    normalizeBool
+    normalizeBool,
+    isString
 } from './util';
 import {Field} from './field';
 import {Form} from './form.service';
@@ -136,9 +137,6 @@ export class MagicControl extends Field {
         this.form.include(this.key)
     }
 
-    /**
-     * returns true when itself or any parent up the tree is hidden
-     */
     get isSelfHidden() { return this._hidden; }
 
     updateValue(value: any) { this.control.updateValue(value, {onlySelf: false}) }
@@ -170,9 +168,9 @@ export class MagicControl extends Field {
     private _getEventObject(event: any) {
         return {
             event: event,
-            field: this,
             form: this.form,
             controls: this.form.magicControls,
+            ngControls: this.form.controls
         }
     }
 

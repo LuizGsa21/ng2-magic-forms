@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {DefaultLayout} from './_layout';
 import {BaseTemplate} from '../base.template';
 import {FormControlDirective} from '@angular/forms';
+import {AsyncOrValuePipe} from '../../pipes/async';
 
 export interface RadioFieldOptions {
     defaultValue?: string;
@@ -17,9 +18,12 @@ export interface RadioFieldOptions {
         DefaultLayout,
         FormControlDirective
     ],
+    pipes: [
+        AsyncOrValuePipe
+    ],
     template: `
     <div defaultLayout [field]="field">
-        <label *ngFor="let radio of field.templateOptions.radios" class="radio-inline">
+        <label *ngFor="let radio of field.templateOptions.radios | asyncOrValue" class="radio-inline">
           <input type="radio" 
             [name]="field.options.key" 
             [value]="radio.value" 
@@ -33,7 +37,12 @@ export interface RadioFieldOptions {
 })
 export class RadioDefaultTemplate extends BaseTemplate {
 
+    constructor() {
+        super();
+    }
+
     ngOnInit() {
+        super.ngOnInit();
         // we have to initialize the default value ourselves because we never bind to an element.
         // NOTE: not doing so will still work but `form.value` wont return the control's value when the form first renders
         this.field.updateValue(this.field.options.defaultValue);

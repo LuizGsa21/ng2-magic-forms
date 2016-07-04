@@ -9,4 +9,8 @@ export interface DivDefaultOptions {
     selector: 'divDefaultTemplate',
     template: `<div [class]="field.options.layoutClassName || ''" [innerHTML]="field.templateOptions.html"></div>`
 })
-export class DivDefaultTemplate extends BaseTemplate {}
+export class DivDefaultTemplate extends BaseTemplate {
+    constructor() {
+        super();
+    }
+}
