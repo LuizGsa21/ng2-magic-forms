@@ -23,8 +23,17 @@ export interface InputDefaultOptions {
     template: `
     <div defaultLayout [field]="field">
      <label *ngIf="field.templateOptions.label" [attr.for]="field.options.key" class="control-label">{{ field.templateOptions.label }}</label>
-     <input [formControl]="field.control" [type]="field.templateOptions.type" [id]="field.options.key" [placeholder]="field.templateOptions.placeholder || ''" class="form-control">
+     test
+     <input #f
+        [formControl]="field.control"
+        (click)="field.onClick(f.value, $event)" 
+        (blur)="field.onBlur(f.value, $event)" 
+        (focus)="field.onFocus(f.value, $event)" 
+        [type]="field.templateOptions.type" 
+        [id]="field.options.key" 
+        [placeholder]="field.templateOptions.placeholder || ''" class="form-control">
     </div>
 `
 })
-export class InputDefaultTemplate extends BaseTemplate {}
+export class InputDefaultTemplate extends BaseTemplate {
+}

@@ -84,7 +84,7 @@ export class MagicViewFactory implements OnInit {
     childRef: ChildRef;
 
     @HostBinding('style.display')
-    get hideSelf() { return this.field.hidden ? 'none' : '' }
+    get hideSelf() { return this.field.isSelfHidden ? 'none' : '' }
 
     @HostBinding('class')
     get hostClassName () { return this.field.hostClassName; }

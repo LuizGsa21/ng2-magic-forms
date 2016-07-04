@@ -83,9 +83,18 @@ export class MagicForm {
     get debugValues () { return this._debug(this.form.value); }
 
     get debugErrors () {
-        let errors = Object.keys(this.form.controls).map((controlName) => {
-            return this.form.controls[controlName].errors
-        }).filter(isPresent);
-        return this._debug(errors);
+        return this._debug(this.fields.map((field: any) => {
+            return {
+                key: field.key,
+                hidden: field.hidden,
+                _hidden: field._hidden,
+                isSelfHidden: field.isSelfHidden,
+                value: field.value,
+                valid: field.valid,
+                errors: field.errors,
+                'options.hidden': field.options.hidden
+            }
+        }));
     }
+
 }

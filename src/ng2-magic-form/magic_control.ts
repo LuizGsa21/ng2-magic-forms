@@ -20,19 +20,19 @@ import {ValidatorFn} from './validators/shared';
  * Wraps the validators providing access to the form and the field options.
  * @private
  */
-function normalizeValidators (validators: any[], control: MagicControl): ValidatorFn {
+function normalizeValidators (validators: any[], magic: MagicControl): ValidatorFn {
     if (isEmpty(validators)) {
         return void 0;
     }
     validators = validators.map((validator) => {
         return function () {
-            return validator(control.control, control);
+            return validator(magic.control, magic);
         }
     });
     return validators.length === 1 ? validators[0] : Validators.compose(validators);
 }
 
-function normalizeOptions(control: MagicControl, options: IOptionField) {
+function normalizeOptions(magic: MagicControl, options: IOptionField) {
     if (isBlank(options)) {
         throwError('field options not specified.')
     }
@@ -53,7 +53,7 @@ function normalizeOptions(control: MagicControl, options: IOptionField) {
     }
     options.hidden = !!options.hidden;
     // normalize validators
-    options._validators = normalizeValidators(options.validators, control);
+    options._validators = normalizeValidators(options.validators, magic);
     return options;
 }
 
@@ -63,6 +63,12 @@ export class MagicControl extends Field {
     _parent: MagicControl;
     /** @internal */
     _children: MagicControl[] = [];
+
+    /** @internal */
+    _hidden: boolean = false;
+    /** @internal */
+    _isParentHidden = false;
+
 
     // exposed only for binding for DOM binding
     control: FormControl;
@@ -74,8 +80,9 @@ export class MagicControl extends Field {
     constructor(options: IOptionField, public form: Form) {
         super();
         this.options = normalizeOptions(this, options);
+        this._hidden = this.options.hidden;
         debug('creating MagicControl', this.options.key, this);
-        this.control = this.form.createControl(this.options.key, this.options.defaultValue);
+        this.control = this.form.createControl(this);
         let children = this.options.children;
         if (!isEmpty(children)) {
             children.forEach((childOptions) => this.addChild(new MagicControl(childOptions, form)));
@@ -97,16 +104,42 @@ export class MagicControl extends Field {
     // apparently typescript doesn't support calling super on getters and setters
     // when generating ES5 code. So we move the getters/setters here for now.
     // see: https://github.com/Microsoft/TypeScript/issues/338
-    public get hidden() { 
-        return this._isParentHidden ? true : this._hidden; 
+    public get hidden() {
+        if (this.options.hidden !== this._hidden) {
+            setTimeout(() => this.hidden = this.options.hidden);
+        }
+        return this._isParentHidden ? true : this._hidden;
     }
+
     public set hidden(value: boolean) {
-        value = !!normalizeBool(value);
         if (this._hidden !== value) {
-            this._hidden = value;
+            debug(this.key, 'UPDATED hidden value to', this.options.hidden);
+            this.options.hidden = this._hidden = value;
             this.notifyChildren();
+            this.includeOrExcludeSelf();
         }
     }
+
+    includeOrExcludeSelf() {
+        if (this._isParentHidden || this._hidden) {
+            this.excludeSelf();
+        } else {
+            this.includeSelf();
+        }
+    }
+
+    excludeSelf() {
+        this.form.exclude(this.key)
+    }
+
+    includeSelf() {
+        this.form.include(this.key)
+    }
+
+    /**
+     * returns true when itself or any parent up the tree is hidden
+     */
+    get isSelfHidden() { return this._hidden; }
 
     updateValue(value: any) { this.control.updateValue(value, {onlySelf: false}) }
     get valid() { return this.control.valid }
@@ -117,13 +150,29 @@ export class MagicControl extends Field {
     get pending() { return this.control.pending; }
     get errors() { return this._errors; }
     
-    onClick (event: any) { this._callEvent('onClick', event); }
-    onBlur (event: any) { this._callEvent('onBlur', event); }
-    onFocus (event: any) { this._callEvent('onFocus', event); }
+    onClick (value: any, event: any) { return this._callEvent('onClick', value, event); }
+    onBlur (value: any, event: any) { return this._callEvent('onBlur', value, event); }
+    onFocus (value: any, event: any) { return this._callEvent('onFocus', value, event); }
     
-    private _callEvent (eventName: string, value: any) {
+    findMagicControl(name) {
+        return this.form.magicControls[name] || null;
+    }
+    
+    private _callEvent (eventName: string, value: any, event: any) {
+        // debug(eventName, 'name', this.key, 'value', value, 'magic', this, 'event', event);
+        debug(eventName, 'name', this.key);
         if (this.options[eventName]) {
-            return this.options[eventName](value, this);
+            return this.options[eventName].call(this, value, this, this._getEventObject(event));
+        }
+        return void 0;
+    }
+
+    private _getEventObject(event: any) {
+        return {
+            event: event,
+            field: this,
+            form: this.form,
+            controls: this.form.magicControls,
         }
     }
 

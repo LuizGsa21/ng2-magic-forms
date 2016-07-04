@@ -1,4 +1,5 @@
 import {MagicValidators} from '../../ng2-magic-form/validators/index';
+import {MagicControl} from '../../ng2-magic-form/magic_control';
 export let FormComplex1 = [
     /**
      * Amenity Name
@@ -52,7 +53,18 @@ export let FormComplex1 = [
         key: 'showPriceOptions',
         type: 'radio',
         defaultValue: '0',
-        
+
+        onClick(radio: any, magic: MagicControl, event: MouseEvent) {
+            let control = magic.findMagicControl('container1');
+            console.log(radio.value, 'radio value', control);
+            if (radio.value == '0') {
+                control.options.hidden = true;
+            } else {
+                control.options.hidden = false;
+            }
+            console.log('control.options.hidden', control.options.hidden);
+        },
+
         templateOptions: {
             radios: [
                 {value: '0', text: 'This amenity has no directly associated price'},
@@ -70,6 +82,8 @@ export let FormComplex1 = [
 
         key: 'container1',
         type: 'container',
+
+        hidden: true,
 
         children: [
             /**

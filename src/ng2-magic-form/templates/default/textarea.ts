@@ -22,7 +22,16 @@ export interface TextareaDefaultOptions {
     template: `
     <div defaultLayout [field]="field" [class]="field.options.templateOptions.className || ''">
          <label *ngIf="field.templateOptions.label" [attr.for]="field.options.key" class="control-label">{{ field.templateOptions.label }}</label>
-         <textarea [formControl]="field.control" [id]="field.options.key" [placeholder]="field.templateOptions.placeholder || ''" [cols]="field.templateOptions.cols" [rows]="field.templateOptions.rows || '4'" class="form-control"></textarea>
+         <textarea #f
+           [formControl]="field.control"
+           (click)="field.onClick(f.value, $event)" 
+           (blur)="field.onBlur(f.value, $event)" 
+           (focus)="field.onFocus(f.value, $event)"
+           [id]="field.options.key"
+           [placeholder]="field.templateOptions.placeholder || ''" 
+           [cols]="field.templateOptions.cols" 
+           [rows]="field.templateOptions.rows || '4'" 
+           class="form-control"></textarea>
     </div>
 `
 })

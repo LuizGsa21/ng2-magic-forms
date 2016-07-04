@@ -5,6 +5,11 @@ import {
 } from '@angular/forms';
 import {throwError} from './util';
 import {ValidatorFn} from './validators/shared';
+import {MagicControl} from './magic_control';
+import {
+    Control,
+    AbstractControl
+} from '@angular/common';
 
 /**
  * An instance Form is created for each form.
@@ -17,20 +22,32 @@ import {ValidatorFn} from './validators/shared';
 @Injectable()
 export class Form extends FormGroup {
 
-    constructor () {
-        super({});
+    magicControls: {
+        [key: string]: MagicControl
+    } = {};
+    
+    constructor () { super({}); }
+
+    /**
+     * Creates a FormControl using the provided MagicControl.
+     */
+    createControl (magic: MagicControl): FormControl {
+        let options = magic.options;
+        // Don't allow duplicate keys
+        if (this.controls.hasOwnProperty(options.key)) {
+            throwError(`'${options.key}' is a DUPLICATE KEY.`)
+        }
+        let control = new FormControl(options.defaultValue);
+        this.magicControls[options.key] = magic;
+        this.addControl(options.key, control);
+        return control;
     }
 
     /**
-     * Creates a control using the provided IOptionField.
+     * Remove a control from this group.
      */
-    createControl (key: string, defaultValue?: any, validators?: ValidatorFn): FormControl {
-        // Don't allow duplicate keys
-        if (this.controls.hasOwnProperty(key)) {
-            throwError(`'${key}' is a DUPLICATE KEY.`)
-        }
-        let control = new FormControl(defaultValue, validators);
-        this.addControl(key, control);
-        return control;
+    removeControl(name: string): void {
+        delete this.magicControls[name];
+        super.removeControl(name);
     }
 }

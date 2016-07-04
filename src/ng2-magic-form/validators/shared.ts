@@ -97,7 +97,7 @@ export class ControlHelper {
             if (!hasRegistered) { // only register once
                 hasRegistered = true;
                 // register for future changes
-                control.valueChanges.subscribe(() => self.updateValueAndValidity({onlySelf: false, emitEvent: true}));
+                control.valueChanges.subscribe(() => self.updateValueAndValidity({onlySelf: true, emitEvent: true}));
             }
             return isValid(self, control) ? null : getErrorMessage();
         }

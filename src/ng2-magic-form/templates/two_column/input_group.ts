@@ -29,7 +29,14 @@ export interface InputGroupTwoColumnTemplate extends TwoColumnTemplate {
       <label leftSide *ngIf="field.templateOptions.label" [attr.for]="field.options.key" class="control-label">{{ field.templateOptions.label }}</label>
       <div rightSide class="input-group">
         <div *ngIf="field.templateOptions.leftAddon" class="input-group-addon">{{ field.templateOptions.leftAddon }}</div>
-        <input [formControl]="field.control" [type]="field.templateOptions.type" [id]="field.options.key" [placeholder]="field.templateOptions.placeholder || ''" class="form-control">
+        <input #f
+            [formControl]="field.control" 
+            [type]="field.templateOptions.type" 
+            [id]="field.options.key" 
+            (click)="field.onClick(f.value, $event)" 
+            (blur)="field.onBlur(f.value, $event)" 
+            (focus)="field.onFocus(f.value, $event)"
+            [placeholder]="field.templateOptions.placeholder || ''" class="form-control">
         <div *ngIf="field.templateOptions.rightAddon" class="input-group-addon">{{ field.templateOptions.rightAddon }}</div>
       </div>
     </div>

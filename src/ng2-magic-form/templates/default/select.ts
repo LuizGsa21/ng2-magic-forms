@@ -19,7 +19,13 @@ export interface SelectFieldOptions {
     template: `
     <div defaultLayout [field]="field">
          <label *ngIf="field.templateOptions.label" [attr.for]="field.options.key" class="control-label">{{ field.templateOptions.label }}</label>
-         <select [formControl]="field.control" [id]="field.options.key" class="form-control">
+         <select #f
+            [formControl]="field.control" 
+            [id]="field.options.key"
+            (click)="field.onClick(f.value, $event)" 
+            (blur)="field.onBlur(f.value, $event)" 
+            (focus)="field.onFocus(f.value, $event)"
+             class="form-control">
             <option *ngFor="let option of field.templateOptions.options" [value]="option.value">{{ option.text }}</option>
          </select>
     </div>
