@@ -21,7 +21,7 @@ import {ValidatorFn} from './validators/shared';
  * Wraps the validators providing access to the form and the field options.
  * @private
  */
-function normalizeValidators (validators: any[], magic: MagicControl): ValidatorFn {
+function normalizeValidators (validators: any[], magic: MagicControl, isAsync = false): ValidatorFn {
     if (isEmpty(validators)) {
         return void 0;
     }
@@ -30,7 +30,12 @@ function normalizeValidators (validators: any[], magic: MagicControl): Validator
             return validator(magic.control, magic);
         }
     });
-    return validators.length === 1 ? validators[0] : Validators.compose(validators);
+    if (validators.length === 1) {
+        return validators[0];
+    } else {
+        return  isAsync ? Validators.composeAsync(validators) : Validators.compose(validators);
+    }
+
 }
 
 function normalizeOptions(magic: MagicControl, options: IOptionField) {
@@ -55,6 +60,7 @@ function normalizeOptions(magic: MagicControl, options: IOptionField) {
     options.hidden = !!options.hidden;
     // normalize validators
     options._validators = normalizeValidators(options.validators, magic);
+    options._asyncValidators = normalizeValidators(options.asyncValidators, magic, true);
     return options;
 }
 
@@ -76,7 +82,7 @@ export class MagicControl extends Field {
 
     options: IOptionField;
     // transformed errors used by templates
-    _errors: any[];
+    _errors: any[] = [];
 
     constructor(options: IOptionField, public form: Form) {
         super();
@@ -89,6 +95,7 @@ export class MagicControl extends Field {
             children.forEach((childOptions) => this.addChild(new MagicControl(childOptions, form)));
         }
         this.control.setValidators(this.options._validators);
+        this.control.setAsyncValidators(this.options._asyncValidators);
         this.registerListeners();
         // wait until all controls are created before syncing errors
         setTimeout(() => this.syncErrors());
@@ -128,15 +135,9 @@ export class MagicControl extends Field {
             this.includeSelf();
         }
     }
-
-    excludeSelf() {
-        this.form.exclude(this.key)
-    }
-
-    includeSelf() {
-        this.form.include(this.key)
-    }
-
+    excludeSelf() { this.form.exclude(this.key) }
+    includeSelf() { this.form.include(this.key) }
+    
     get isSelfHidden() { return this._hidden; }
 
     updateValue(value: any) { this.control.updateValue(value, {onlySelf: false}) }
@@ -152,15 +153,17 @@ export class MagicControl extends Field {
     onBlur (value: any, event: any) { return this._callEvent('onBlur', value, event); }
     onFocus (value: any, event: any) { return this._callEvent('onFocus', value, event); }
     
-    findMagicControl(name) {
+    getControl(name) {
         return this.form.magicControls[name] || null;
     }
     
-    private _callEvent (eventName: string, value: any, event: any) {
-        // debug(eventName, 'name', this.key, 'value', value, 'magic', this, 'event', event);
+    private _callEvent (eventName: string, value: any, event?: any) {
         debug(eventName, 'name', this.key);
         if (this.options[eventName]) {
-            return this.options[eventName].call(this, value, this, this._getEventObject(event));
+            if (event) {
+                return this.options[eventName].call(this, value, this, this._getEventObject(event));
+            }
+            return this.options[eventName].call(this, value, this);
         }
         return void 0;
     }
@@ -175,6 +178,10 @@ export class MagicControl extends Field {
     }
 
     syncErrors() {
+        if (this.control.status === 'VALID') {
+            // Reset error array and keep same reference if array is empty
+            return this._errors = (this._errors.length) ?  [] : this._errors;
+        }
         let errors = this.control.errors;
         debug('syncErrors() name', this.key, errors);
         if (isBlank(errors)) {
@@ -188,12 +195,14 @@ export class MagicControl extends Field {
         })
     }
     registerListeners() {
-        this.control.valueChanges.subscribe(() => {
-            debug('valueChanges controlName:', this.key);
-            this.syncErrors();
+        this.control.valueChanges.subscribe((value) => {
+            debug('valueChanges controlName:', this.key, value);
+            this._callEvent('onValueChanges', value)
         });
-        this.control.statusChanges.subscribe(() => {
-            debug('statusChanges controlName:', this.key);
+        this.control.statusChanges.subscribe((status) => {
+            this.syncErrors();
+            debug('statusChanges controlName:', this.key, status);
+            this._callEvent('onStatusChanges', status)
         });
     }
 }

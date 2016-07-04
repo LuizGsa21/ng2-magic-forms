@@ -19,9 +19,11 @@ import {
 } from './util';
 import {ValidatorFn} from './validators/shared';
 import {MagicControl} from './magic_control';
+import {AsyncValidatorFn} from '@angular/forms';
 
 export interface IOptionField {
 
+    _asyncValidators: AsyncValidatorFn;
     key: string;
     type: string;
 
@@ -35,6 +37,7 @@ export interface IOptionField {
     validators?: any[];
     /** @internal */
     _validators: ValidatorFn;
+    asyncValidators: any[];
     defaultValue?: any;
     children?: IOptionField[];
 

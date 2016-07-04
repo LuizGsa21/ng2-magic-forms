@@ -1,6 +1,9 @@
 import {MagicValidators} from '../../ng2-magic-form/validators/index';
 import {MagicControl} from '../../ng2-magic-form/magic_control';
 import {Observable} from 'rxjs/Rx';
+import {Validators} from '@angular/forms';
+import {Control} from '@angular/common';
+
 export let FormComplex1 = [
     /**
      * Amenity Name
@@ -63,8 +66,12 @@ export let FormComplex1 = [
         type: 'radio',
         defaultValue: '0',
 
+        //onBlur
+        //onFocus
+        //onValueChanges
+        //onStatusChanges
         onClick(radio: any, magic: MagicControl, event: MouseEvent) {
-            let control = magic.findMagicControl('container1');
+            let control = magic.getControl('container1');
             console.log(radio.value, 'radio value', control);
             if (radio.value == '0') {
                 control.options.hidden = true;
@@ -121,8 +128,19 @@ export let FormComplex1 = [
                 type: 'inputGroup',
                 defaultValue: null,
                 validators: [
-                    MagicValidators.requiredWhen('showPriceOptions', 'Price field is required.')
+                    MagicValidators.requiredWhen('showPriceOptions', 'Price field is required.'),
                 ],
+                asyncValidators: [
+                    (control: Control, magic: MagicControl) => {
+                        return Observable.create((obs) => {
+                            setTimeout(() => {
+                                obs.next({myAsyncError: {message: 'This error message is asynchronous'}});
+                                obs.complete();
+                            })
+                        });
+                    },
+                ],
+
 
                 templateOptions: {
                     leftSideClass: 'col-xs-4',
