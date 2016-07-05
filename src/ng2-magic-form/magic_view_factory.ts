@@ -8,9 +8,10 @@ import {
     Type,
     ViewChild,
     ComponentFactory,
-    OnInit
+    OnInit,
+    ChangeDetectorRef
 } from '@angular/core';
-import {Form} from './form.service';
+import {MagicForm} from './magic_form';
 import {TemplateConfig} from './templates/templates';
 import {
     isBlank,
@@ -23,7 +24,6 @@ import {AsyncValidatorFn} from '@angular/forms';
 
 export interface IOptionField {
 
-    _asyncValidators: AsyncValidatorFn;
     key: string;
     type: string;
 
@@ -32,19 +32,10 @@ export interface IOptionField {
     templateClassName?: string;
 
     hidden?: any;
-    /** @internal */
-    _hiddenFn(value: any, options: IOptionField, form: Form): boolean;
     validators?: any[];
-    /** @internal */
-    _validators: ValidatorFn;
     asyncValidators: any[];
     defaultValue?: any;
     children?: IOptionField[];
-
-    /**
-     * Options defined by template and layout.
-     */
-    templateOptions?: any;
 
     /**
      * Field events
@@ -54,6 +45,18 @@ export interface IOptionField {
     onBlur: any;
     onFocus: any;
 
+    /**
+     * Options defined by templates and layouts.
+     */
+    templateOptions?: any;
+    
+    /** @internal */
+    _hiddenFn(value: any, options: IOptionField, form: MagicForm): boolean;
+    
+    /** @internal */
+    _validators: ValidatorFn;
+    /** @internal */
+    _asyncValidators: AsyncValidatorFn;
 
 }
 
@@ -92,13 +95,13 @@ export class MagicViewFactory implements OnInit {
     @HostBinding('class')
     get hostClassName () { return this.field.hostClassName; }
 
-    constructor (private _componentResolver: ComponentResolver, private templateConfig: TemplateConfig) {}
+    constructor (private _ref: ChangeDetectorRef, private _componentResolver: ComponentResolver, private templateConfig: TemplateConfig) {}
 
     ngOnInit () {
         debug('MagicField.ngOnInit()', this.field.key, this);
+        this.field.viewRef = this._ref;
         this._createView();
     }
-
 
     private _createView () {
         if (this.field.type === 'container') {

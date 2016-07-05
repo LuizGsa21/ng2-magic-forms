@@ -3,18 +3,17 @@ import {
     isEmpty,
     isBlank,
     debug,
-    throwError,
-    normalizeBool,
-    isString
+    throwError
 } from './util';
 import {Field} from './field';
-import {Form} from './form.service';
-import {IOptionField} from './magic_field.component';
+import {MagicForm} from './magic_form';
+import {IOptionField} from './magic_view_factory';
 import {
     FormControl,
     Validators
 } from '@angular/forms';
 import {ValidatorFn} from './validators/shared';
+import {ChangeDetectorRef} from '@angular/core';
 
 
 /**
@@ -64,43 +63,58 @@ function normalizeOptions(magic: MagicControl, options: IOptionField) {
     return options;
 }
 
+/**
+ * Magic control is the main field used in a template.
+ */
 export class MagicControl extends Field {
 
     /** @internal */
     _parent: MagicControl;
     /** @internal */
     _children: MagicControl[] = [];
-
     /** @internal */
     _hidden: boolean = false;
     /** @internal */
     _isParentHidden = false;
 
+    /**
+     * Set by MagicViewFactory
+     */
+    viewRef: ChangeDetectorRef;
 
     // exposed only for binding for DOM binding
     control: FormControl;
+    id: string;
 
-    options: IOptionField;
     // transformed errors used by templates
     _errors: any[] = [];
 
-    constructor(options: IOptionField, public form: Form) {
+    constructor(public options: IOptionField, public form: MagicForm) {
         super();
-        this.options = normalizeOptions(this, options);
-        this._hidden = this.options.hidden;
         debug('creating MagicControl', this.options.key, this);
-        this.control = this.form.createControl(this);
+        this.id = this.form.prefix + this.options.key;
+        this.options = normalizeOptions(this, options);
+        // setting hidden status prior to creating the children is required
+        // their parent status wont be properly set.
+        this._hidden = this.options.hidden;
+        // create control and automatically attach itself to the form.
+        this.control = new FormControl(options.defaultValue);
+        this.form.attachMagicControl(this);
+
+        // create children recursively
         let children = this.options.children;
         if (!isEmpty(children)) {
             children.forEach((childOptions) => this.addChild(new MagicControl(childOptions, form)));
         }
         this.control.setValidators(this.options._validators);
         this.control.setAsyncValidators(this.options._asyncValidators);
+
         this.registerListeners();
         // wait until all controls are created before syncing errors
-        setTimeout(() => this.syncErrors());
+        setTimeout(() => this.syncErrors(), 0);
     }
 
+    // re-export form options
     get key() { return this.options.key }
     get type() { return this.options.type }
     get hostClassName() { return this.options.hostClassName || '' }
@@ -109,37 +123,7 @@ export class MagicControl extends Field {
     get defaultValue() { return this.options.defaultValue || ''}
     get templateOptions() { return this.options.templateOptions }
 
-    // apparently typescript doesn't support calling super on getters and setters
-    // when generating ES5 code. So we move the getters/setters here for now.
-    // see: https://github.com/Microsoft/TypeScript/issues/338
-    public get hidden() {
-        if (this.options.hidden !== this._hidden) {
-            setTimeout(() => this.hidden = this.options.hidden);
-        }
-        return this._isParentHidden ? true : this._hidden;
-    }
-
-    public set hidden(value: boolean) {
-        if (this._hidden !== value) {
-            debug(this.key, 'UPDATED hidden value to', this.options.hidden);
-            this.options.hidden = this._hidden = value;
-            this.notifyChildren();
-            this.includeOrExcludeSelf();
-        }
-    }
-
-    includeOrExcludeSelf() {
-        if (this._isParentHidden || this._hidden) {
-            this.excludeSelf();
-        } else {
-            this.includeSelf();
-        }
-    }
-    excludeSelf() { this.form.exclude(this.key) }
-    includeSelf() { this.form.include(this.key) }
-    
-    get isSelfHidden() { return this._hidden; }
-
+    // re-export FormControl properties
     updateValue(value: any) { this.control.updateValue(value, {onlySelf: false}) }
     get valid() { return this.control.valid }
     get value() { return this.control.value }
@@ -148,15 +132,45 @@ export class MagicControl extends Field {
     get statusChanges() { return this.control.statusChanges; }
     get pending() { return this.control.pending; }
     get errors() { return this._errors; }
-    
+
+
+    // apparently typescript doesn't support calling super on getters and setters
+    // when generating ES5 code. So we move the getters/setters here for now.
+    // see: https://github.com/Microsoft/TypeScript/issues/338
+    public get hidden() {
+        return this._isParentHidden ? true : this._hidden;
+    }
+
+    public set hidden(value: boolean) {
+        if (this._hidden !== value) {
+            debug(this.key, 'UPDATED hidden value to', this.options.hidden);
+            this._hidden = value;
+            this.notifyChildren();
+            this.includeOrExcludeSelf();
+            this.markForCheck();
+        }
+    }
+
+    markForCheck() {
+        this.viewRef.markForCheck();
+    }
+
+    excludeSelf() { this.form.exclude(this.key) }
+    includeSelf() { this.form.include(this.key) }
+    includeOrExcludeSelf() { (this._isParentHidden || this._hidden) ? this.excludeSelf() : this.includeSelf(); }
+
+    /**
+     * Returns true if this field is marked as `hidden`, ignoring any parents visibility status.
+     * @returns {boolean}
+     */
+    get isSelfHidden() { return this._hidden; }
+
+    getControl(name) { return this.form.getMagicControl(name); }
+
     onClick (value: any, event: any) { return this._callEvent('onClick', value, event); }
     onBlur (value: any, event: any) { return this._callEvent('onBlur', value, event); }
     onFocus (value: any, event: any) { return this._callEvent('onFocus', value, event); }
-    
-    getControl(name) {
-        return this.form.magicControls[name] || null;
-    }
-    
+
     private _callEvent (eventName: string, value: any, event?: any) {
         debug(eventName, 'name', this.key);
         if (this.options[eventName]) {
@@ -194,14 +208,13 @@ export class MagicControl extends Field {
             };
         })
     }
+
     registerListeners() {
         this.control.valueChanges.subscribe((value) => {
-            debug('valueChanges controlName:', this.key, value);
             this._callEvent('onValueChanges', value)
         });
         this.control.statusChanges.subscribe((status) => {
             this.syncErrors();
-            debug('statusChanges controlName:', this.key, status);
             this._callEvent('onStatusChanges', status)
         });
     }

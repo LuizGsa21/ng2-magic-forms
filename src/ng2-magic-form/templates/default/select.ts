@@ -22,10 +22,10 @@ export interface SelectFieldOptions {
     ],
     template: `
     <div defaultLayout [field]="field">
-         <label *ngIf="field.templateOptions.label | asyncOrValue" [attr.for]="field.options.key" class="control-label">{{ field.templateOptions.label | asyncOrValue}}</label>
+         <label *ngIf="field.templateOptions.label | asyncOrValue" [attr.for]="field.id" class="control-label">{{ field.templateOptions.label | asyncOrValue}}</label>
          <select #f
             [formControl]="field.control" 
-            [id]="field.options.key"
+            [id]="field.id"
             (click)="field.onClick(f.value, $event)" 
             (blur)="field.onBlur(f.value, $event)" 
             (focus)="field.onFocus(f.value, $event)"

@@ -3,7 +3,7 @@ import {
     HostBinding
 } from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {IOptionField} from '../magic_field.component';
+import {IOptionField} from '../magic_view_factory';
 import {MagicControl} from '../magic_control';
 
 

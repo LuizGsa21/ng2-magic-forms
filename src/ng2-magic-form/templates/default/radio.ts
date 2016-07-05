@@ -25,7 +25,7 @@ export interface RadioFieldOptions {
     <div defaultLayout [field]="field">
         <label *ngFor="let radio of field.templateOptions.radios | asyncOrValue" class="radio-inline">
           <input type="radio" 
-            [name]="field.options.key" 
+            [name]="field.id" 
             [value]="radio.value" 
             (click)="onClick(radio, $event)" 
             (blur)="field.onBlur(radio, $event)" 

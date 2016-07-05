@@ -1,35 +1,35 @@
 import {MagicValidators} from '../../ng2-magic-form/validators/index';
 import {MagicControl} from '../../ng2-magic-form/magic_control';
 import {Observable} from 'rxjs/Rx';
-import {Validators} from '@angular/forms';
 import {Control} from '@angular/common';
 
-export let FormComplex1 = [
+export let FormOptions1 = [
     /**
      * Amenity Name
      */
     {
         hostClassName: 'col-xs-12 hostClassName',
-        templateClassName: 'row templateClassName',
-        layoutClassName: 'col-xs-12 layoutClassName',
+        // templateClassName: 'row templateClassName',
+        // layoutClassName: 'col-xs-12 layoutClassName',
 
         key: 'amenityName',
         type: 'input',
         defaultValue: null,
         validators: [
-            MagicValidators.requiredTransform('A name for the new Amenity is required')
+            MagicValidators.requiredTransform('A name for the new Amenity is required'),
+            MagicValidators.invalidValues(['someName'])
         ],
         
         templateOptions: {
-            // label: 'Name of The New Amenity',
-            // add asynchronous text
-            label: Observable.create((obs) => {
-                obs.next(null);
-                setTimeout(() => {
-                    obs.next('Name of The New Amenity (This was added async)');
-                    obs.complete();
-                }, 1000)
-            }).share(),
+            label: 'Name of The New Amenity',
+            // add asynchronous text example
+            // label: Observable.create((obs) => {
+            //     obs.next(null);
+            //     setTimeout(() => {
+            //         obs.next('Name of The New Amenity (This was added async)');
+            //         obs.complete();
+            //     }, 1000)
+            // }).share(),
             type: 'text',
             description: 'eg Tanning, Free Towels, Sauna, VIP pass'
         }
@@ -39,8 +39,8 @@ export let FormComplex1 = [
      */
     {
         hostClassName: 'col-xs-12 hostClassName',
-        templateClassName: 'row templateClassName',
-        layoutClassName: 'col-xs-12 layoutClassName',
+        // templateClassName: 'row templateClassName',
+        // layoutClassName: 'col-xs-12 layoutClassName',
 
         key: 'amenityDescription',
         type: 'textarea',
@@ -59,8 +59,8 @@ export let FormComplex1 = [
      */
     {
         hostClassName: 'col-xs-12 hostClassName',
-        templateClassName: 'row templateClassName',
-        layoutClassName: 'col-xs-12 layoutClassName',
+        // templateClassName: 'row templateClassName',
+        // layoutClassName: 'col-xs-12 layoutClassName',
 
         key: 'showPriceOptions',
         type: 'radio',
@@ -72,12 +72,7 @@ export let FormComplex1 = [
         //onStatusChanges
         onClick(radio: any, magic: MagicControl, event: MouseEvent) {
             let control = magic.getControl('container1');
-            console.log(radio.value, 'radio value', control);
-            if (radio.value == '0') {
-                control.options.hidden = true;
-            } else {
-                control.options.hidden = false;
-            }
+            control.hidden = (radio.value == 'hide') ? true : false;
         },
 
         templateOptions: {
@@ -91,9 +86,9 @@ export let FormComplex1 = [
      * Price Container
      */
     {
-        hostClassName: 'col-xs-12 container1 hostClassName',
-        templateClassName: 'row templateClassName',
-        layoutClassName: 'col-xs-12 layoutClassName',
+        // hostClassName: 'col-xs-12 container1 hostClassName',
+        // templateClassName: 'row templateClassName',
+        // layoutClassName: 'col-xs-12 layoutClassName',
 
         key: 'container1',
         type: 'container',
@@ -105,9 +100,9 @@ export let FormComplex1 = [
              * Amenity Price info
              */
             {
-                hostClassName: 'col-xs-12 hostClassName',
-                templateClassName: 'row templateClassName',
-                layoutClassName: 'col-xs-12 layoutClassName',
+                // hostClassName: 'col-xs-12 hostClassName',
+                // templateClassName: 'row templateClassName',
+                // layoutClassName: 'col-xs-12 layoutClassName',
 
                 key: 'priceAmenityInfo',
                 type: 'div',

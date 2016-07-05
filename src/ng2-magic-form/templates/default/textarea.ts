@@ -25,13 +25,13 @@ export interface TextareaDefaultOptions {
     ],
     template: `
     <div defaultLayout [field]="field" [class]="field.options.templateOptions.className || ''">
-         <label [style.display]="(field.templateOptions.label | asyncOrValue) ? null : 'none'" [attr.for]="field.options.key" class="control-label">{{ field.templateOptions.label | asyncOrValue }}</label>
+         <label [style.display]="(field.templateOptions.label | asyncOrValue) ? null : 'none'" [attr.for]="field.id" class="control-label">{{ field.templateOptions.label | asyncOrValue }}</label>
          <textarea #f
            [formControl]="field.control"
            (click)="field.onClick(f.value, $event)" 
            (blur)="field.onBlur(f.value, $event)" 
            (focus)="field.onFocus(f.value, $event)"
-           [id]="field.options.key"
+           [id]="field.id"
            [placeholder]="field.templateOptions.placeholder | asyncOrValue:''" 
            [cols]="field.templateOptions.cols" 
            [rows]="field.templateOptions.rows || '4'" 

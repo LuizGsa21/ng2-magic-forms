@@ -1,15 +1,13 @@
 import {
     Pipe,
     OnDestroy,
-    EventEmitter,
     ChangeDetectorRef,
-    WrappedValue,
+    WrappedValue
 } from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 import {
     isPresent,
     isBlank,
-    noop,
     isPromise,
     isObservable
 } from '../util';
@@ -79,7 +77,7 @@ export class AsyncOrValuePipe implements OnDestroy {
         }
     }
 
-    transform(obj: any, defaultValue?: any): any {
+    transform(obj: any): any {
         if (isBlank(this._obj)) {
             if (isPresent(obj)) {
                 this._subscribe(obj);
@@ -90,7 +88,7 @@ export class AsyncOrValuePipe implements OnDestroy {
 
         if (obj !== this._obj) {
             this._dispose();
-            return this.transform(obj, defaultValue);
+            return this.transform(obj);
         }
 
         if (this._latestValue === this._latestReturnedValue) {

@@ -53,8 +53,8 @@ export class Field{
             warn('parentStatusChanged() was called but parent never changed.... you should report this bug.');
         }
         this._isParentHidden = this._parent.hidden;
-        this.includeOrExcludeSelf();
         this.notifyChildren();
+        this.includeOrExcludeSelf();
     }
 
     notifyChildren() {

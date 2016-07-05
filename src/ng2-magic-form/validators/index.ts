@@ -2,6 +2,7 @@ import {required} from './required';
 import {lessThan} from './less_than';
 import {greaterThan} from './greater_than';
 import {requiredWhen} from './required_when';
+import {invalidValues} from './invalidValues';
 import {
     transformValidator,
     transformValidatorInvoke
@@ -14,6 +15,7 @@ export class MagicValidators {
     static requiredTransform = transformValidator(required);
     
     static requiredWhen = transformValidatorInvoke(requiredWhen);
+    static invalidValues = invalidValues;
 
     static lessThan = lessThan;
     static lessThanTransform = transformValidatorInvoke(lessThan);

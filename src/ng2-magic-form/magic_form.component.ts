@@ -8,18 +8,17 @@ import {
 import {
     MagicViewFactory,
     IOptionField
-} from './magic_field.component';
+} from './magic_view_factory';
 import {
     FormGroup,
     REACTIVE_FORM_DIRECTIVES,
     FORM_DIRECTIVES
 } from '@angular/forms';
-import {Form} from './form.service';
+import {MagicForm} from './magic_form';
 import {
     debug,
     print,
     isBlank,
-    isPresent,
     isEmpty
 } from './util';
 import {MagicControl} from './magic_control';
@@ -29,7 +28,7 @@ import {MagicControl} from './magic_control';
     selector: 'magicForm',
     exportAs: 'magicForm',
     providers: [
-        Form
+        MagicForm
     ],
     directives: [
         FORM_DIRECTIVES,
@@ -45,13 +44,13 @@ Is form valid? {{ valid }}
 Form values:
 {{ debugValues }}
 
-Form errors:
-{{ debugErrors }}
+<!--Form errors:-->
+<!--{{ debugErrors }}-->
 </pre>
     </form>
 `
 })
-export class MagicForm {
+export class MagicFormComponent {
 
     @Input('options')
     formOptions: IOptionField[];
@@ -60,7 +59,7 @@ export class MagicForm {
     @Output('onSubmit')
     onSubmit: EventEmitter<FormGroup> = new EventEmitter<FormGroup>();
 
-    constructor (@Self() public form: Form) {  }
+    constructor (@Self() public form: MagicForm) {  }
 
     ngOnInit() {
         debug('Created MagicForm:', this);
