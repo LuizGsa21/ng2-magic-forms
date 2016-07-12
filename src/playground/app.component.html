@@ -1,12 +1,4 @@
 <div class="container">
-
-  <!-- Form 1 -->
-  <magicForm class="row form1" #f="magicForm" [options]="formOptions1" (onSubmit)="submit(f.value)">
-    <button>FormBasic1</button>
-  </magicForm>
-  <!-- Form 2 -->
-  <magicForm class="row form2" #f="magicForm" [options]="formOptions2" (onSubmit)="submit(f.value)">
-    <button>FormBasic2</button>
-  </magicForm>
+  <form [magicForm]="form"></form>
 </div>
 

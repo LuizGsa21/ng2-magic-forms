@@ -8,57 +8,16 @@ import {
     Type,
     ViewChild,
     ComponentFactory,
-    OnInit,
-    ChangeDetectorRef
+    OnInit
 } from '@angular/core';
-import {MagicForm} from './magic_form';
-import {TemplateConfig} from './templates/templates';
 import {
     isBlank,
     throwError,
     debug
-} from './util';
-import {ValidatorFn} from './validators/shared';
+} from '../util';
 import {MagicControl} from './magic_control';
-import {AsyncValidatorFn} from '@angular/forms';
+import {TemplateConfig} from './template_config';
 
-export interface IOptionField {
-
-    key: string;
-    type: string;
-
-    hostClassName?: string;
-    layoutClassName?: string;
-    templateClassName?: string;
-
-    hidden?: any;
-    validators?: any[];
-    asyncValidators: any[];
-    defaultValue?: any;
-    children?: IOptionField[];
-
-    /**
-     * Field events
-     */
-    valueChanges: any;
-    onClick: any;
-    onBlur: any;
-    onFocus: any;
-
-    /**
-     * Options defined by templates and layouts.
-     */
-    templateOptions?: any;
-    
-    /** @internal */
-    _hiddenFn(value: any, options: IOptionField, form: MagicForm): boolean;
-    
-    /** @internal */
-    _validators: ValidatorFn;
-    /** @internal */
-    _asyncValidators: AsyncValidatorFn;
-
-}
 
 /**
  * Hack used to get reference of parent view.
@@ -80,12 +39,12 @@ export class ChildRef {
     ],
     template: `<div childRef></div>`
 })
-export class MagicViewFactory implements OnInit {
+export class MagicControlFactory implements OnInit {
 
 
     @Input('field')
     field: MagicControl;
-    
+
     @ViewChild(ChildRef as Type)
     childRef: ChildRef;
 
@@ -95,11 +54,13 @@ export class MagicViewFactory implements OnInit {
     @HostBinding('class')
     get hostClassName () { return this.field.hostClassName; }
 
-    constructor (private _ref: ChangeDetectorRef, private _componentResolver: ComponentResolver, private templateConfig: TemplateConfig) {}
+    constructor (private _componentResolver: ComponentResolver, private templateConfig: TemplateConfig) {}
 
     ngOnInit () {
+        if (isBlank(this.field)) {
+            throwError(`MagicControl field is missing...`)
+        }
         debug('MagicField.ngOnInit()', this.field.key, this);
-        this.field.viewRef = this._ref;
         this._createView();
     }
 
@@ -124,8 +85,8 @@ export class MagicViewFactory implements OnInit {
 
     private _createContainer (children: MagicControl[]) {
         return children.map((child) => {
-            return this._componentResolver.resolveComponent(MagicViewFactory as Type).then((componentFactory: ComponentFactory<any>) => {
-                let viewInstance = this.childRef.viewContainer.createComponent(componentFactory).instance as MagicViewFactory;
+            return this._componentResolver.resolveComponent(MagicControlFactory as Type).then((componentFactory: ComponentFactory<any>) => {
+                let viewInstance = this.childRef.viewContainer.createComponent(componentFactory).instance as MagicControlFactory;
                 viewInstance.field = child;
             });
         });

@@ -3,8 +3,7 @@ import {
     HostBinding
 } from '@angular/core';
 import {FormControl} from '@angular/forms';
-import {IOptionField} from '../magic_view_factory';
-import {MagicControl} from '../magic_control';
+import {MagicControl} from '../core/magic_control';
 
 
 export class BaseTemplate {
@@ -15,7 +14,7 @@ export class BaseTemplate {
     @HostBinding('class')
     get className () { return this.field.templateClassName; }
     get control (): FormControl { return this.field.control; }
-    get templateOptions (): IOptionField { return this.field.templateOptions; }
+    get templateOptions (): any { return this.field.templateOptions; }
     get options () { return this.field.options; }
 
     ngOnInit() {
@@ -27,7 +26,6 @@ export class BaseTemplate {
      */
     normalizeOptions() {
         let options = this.field.templateOptions;
-        ['label', 'placeholder', 'description']
-            .forEach((propName) => options[propName] = options[propName] || '');
+        ['label', 'placeholder', 'description'].forEach((propName) => options[propName] = options[propName] || '');
     }
 }

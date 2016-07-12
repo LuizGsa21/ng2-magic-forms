@@ -3,7 +3,7 @@ import {
     HostBinding
 } from '@angular/core';
 import {BaseTemplate} from './base.template';
-import {MagicControl} from '../magic_control';
+import {MagicControl} from '../core/magic_control';
 
 
 export class BaseLayout extends BaseTemplate {
